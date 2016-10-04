@@ -67,7 +67,7 @@ class CSV:
         X=[]
         Y=[]
         
-        with open(path) as f:
+        with open(path,mode = 'U') as f:
             
             for line in f:
                 
