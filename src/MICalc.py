@@ -64,8 +64,8 @@ class MICalc:
         self.data_size = len(Y)
         if len(X) != self.data_size:
             raise RuntimeError("Data arrays not of equal size")
-
-        self.bin_x(n_bins = n_bins)
+        if n_bins > 0:
+            self.bin_x(n_bins = n_bins)
         self.get_mutual_info()
 
     def bin_x(self, n_bins = 10):
@@ -140,14 +140,32 @@ class MICalc:
             self.MI.append( (att, self.mutual_info(self.X[:,att], self.Y)) )
 
     def printMutualInfo(self, labels = None):
-        print "Feature           | Mutual Information"
-        print "______________________________"
+        print "Feature                        | Mutual Information"
+        print "____________________________________________________"
         self.MI.sort(key = lambda tup: tup[1], reverse = True)
+        _, attr = self.X.shape
+        if labels is not None and attr != len(labels):
+            print "error: number of labels suppiled not equal to number of attributes"
+            os.Exit(0)
         for feature,mi in self.MI:
             if labels is None:
-                print("{:<18}| {:2.3f}".format(feature,mi))
+                print("{:<31}| {:2.6f}".format(feature,mi))
             else:
-                print("{:<18}| {:2.3f}".format(labels[feature],mi))
+                print("{:<31}| {:2.6f}".format(labels[feature],mi))
+
+    def writeToFile(self, filename, labels = None):
+        _, attr = self.X.shape
+        if labels is not None and attr != len(labels):
+            print "error: number of labels suppiled not equal to number of attributes"
+            os.Exit(0)
+        with open(filename,'w') as f:
+            for feature,mi in self.MI:
+                if labels is None:
+                    f.write("{},{}\n".format(feature,mi))
+                else:
+                    f.write("{},{}\n".format(labels[feature],mi))
+
+
 
 
 
@@ -158,10 +176,9 @@ allowed_filenames = re.compile(".*\.csv")
 
 parser = argparse.ArgumentParser(description = 'Find the mutual information of features in a dataset')
 parser.add_argument("filename", help = "The file containing the dataset. Must be in CSV format")
-parser.add_argument("-b","--bins", type = int, help = "The number of bins to use when discretizing the features (default = 10)")
+parser.add_argument("-b","--bins", type = int, help = "The number of bins to use when discretizing the features (default = 10). If the data has been discretized already, then setting this option to 0 will disable the binning.")
 parser.add_argument("-q","--quiet", action = "store_true", help = "Whether to print the output to command line as a table")
 parser.add_argument("-d", "--dest", help = "Filename of a destination file")
-parser.add_argument("-f", "--format", help = "The output file format (default CSV)", default = "csv")
 parser.add_argument("-l", "--labels", help = "An optional file containing labels for the features. Must be a single csv line in the same order as the features in the target file")
 
 args = parser.parse_args()
@@ -179,3 +196,8 @@ x,y = csv.read(args.filename)
 m = MICalc(x,y,n_bins = args.bins)
 if not args.quiet:
     m.printMutualInfo(labels)
+if args.dest is not None:
+    if allowed_filenames.match(args.dest) is None:
+        args.dest = args.dest + '.csv'
+    m.writeToFile(args.dest)
+
