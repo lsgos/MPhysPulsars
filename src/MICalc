@@ -1,13 +1,18 @@
-"""
-A program to calculate the mutual imformation of each feature in a dataset w.r.t the class labels. Expects a file in csv format, and outputs the scores as a table printed to the command line.
+#!/usr/bin/env python
 
 """
+A program to calculate the mutual information of each feature in a dataset w.r.t the class labels. Expects a file in csv format, and outputs the scores as a table printed to the command line.
+
+"""
+
 from __future__ import division
 import argparse
 import numpy as np
 import re
 import os
-import ipdb
+
+INSTALLPATH = os.path.join('/','home','lewis','MPhysProject-s1','src')
+
 class CSV:
     def read(self,path):
         """
@@ -179,10 +184,15 @@ parser.add_argument("filename", help = "The file containing the dataset. Must be
 parser.add_argument("-b","--bins", type = int, help = "The number of bins to use when discretizing the features (default = 10). If the data has been discretized already, then setting this option to 0 will disable the binning.")
 parser.add_argument("-q","--quiet", action = "store_true", help = "Whether to print the output to command line as a table")
 parser.add_argument("-d", "--dest", help = "Filename of a destination file")
-parser.add_argument("-l", "--labels", help = "An optional file containing labels for the features. Must be a single csv line in the same order as the features in the target file")
+parser.add_argument("-l", "--labels", help = "An optional file containing labels for the features. Must be a single csv line in the same order as the features in the target file. Alternatively, the options 'Lyon' or 'Thornton' will use stored label files for these feature sets.")
 
 args = parser.parse_args()
 if args.labels is not None:
+    if args.labels == 'Lyon':
+        args.labels = os.path.join(INSTALLPATH,'resources','lyonlabels.csv')
+    elif args.labels == 'Thornton':
+        args.labels = os.path.join(INSTALLPATH,'resources','thorntonlabels.csv')
+
     labels = read_label_file(args.labels)
 else:
     labels = None
