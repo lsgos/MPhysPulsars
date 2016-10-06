@@ -15,18 +15,6 @@ INSTALLPATH = os.path.join('/','home','lewis','MPhysProject-s1','src')
 
 class CSV:
     def read(self,path):
-        """
-        Converts numerical CSV data in to X,Y format for use by SciKit-Learn,
-        where X is the data and Y the labels. Assumes the class label is the last
-        item on each row (i.e. the last column of data).
-        Does not work with text data.
-        Parameters:
-        path    -    the path to the CSV file to load.
-        Returns:
-        CSV data in X,Y form. X is a 2D np array, such that each row contains
-        a unique data instance. Y is a column vector containing the class labels of
-        each data item.
-        """
         X=[]
         Y=[]
         with open(path,mode = 'U') as f:
