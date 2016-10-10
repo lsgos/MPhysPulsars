@@ -89,27 +89,44 @@ class MICalc:
             H = H - p_x[x_i] * np.log2(p_x[x_i])
         return H
 
-    def px_given_y(self,x,y):
-        #calculate the conditional probability of x given y: P(x intersect y) / P(y)
+    def px_joint_y(self,x,y):
         if len(x)!= len(y):
             raise RuntimeError("Array lengths must be equal")
-        p_y = self.get_probs(y)
         classes_x = np.unique(x)
-        p_x_cond_y = {}
+        classes_y = np.unique(y)
+        p_x_joint_y = {}
         for i in xrange(len(classes_x)):
-            p_x_cond_y[classes_x[i]] = {}
-            for y_j in p_y:
-                p_x_cond_y[classes_x[i]][y_j] = 0
+            p_x_joint_y[classes_x[i]] = {}
+            for j in xrange(len(classes_y)):
+                p_x_joint_y[classes_x[i]][classes_y[j]] = 0
         for i in xrange(len(x)):
-            p_x_cond_y[x[i]][y[i]] +=1
-        #now p_x_cond_y contains the frequencies: normalize it to the data size to make it a probability distribution, and divide by corresponding p_y to get p(x|y)
-        for i in p_x_cond_y:
-            for j in p_x_cond_y[i]:
-                p_x_cond_y[i][j] = p_x_cond_y[i][j] / self.data_size
+            p_x_joint_y[x[i]][y[i]] +=1
+        #now p_x_joint_y contains the frequencies: normalize it to the data size to make it a probability distribution, and divide by corresponding p_y to get p(x|y)
+
+
+        for i in p_x_joint_y:
+            for j in p_x_joint_y[i]:
+                p_x_joint_y[i][j] = p_x_joint_y[i][j] / self.data_size
+        return p_x_joint_y
+
+    def px_given_y(self,x,y):
+        #calculate the conditional probability of x given y: P(x intersect y) / P(y)
+        p_y = self.get_probs(y)
+        p_x_cond_y = self.px_joint_y(x,y)
         for i in p_x_cond_y:
             for j in p_x_cond_y[i]:
                 p_x_cond_y[i][j] = p_x_cond_y[i][j] / p_y[j]
         return p_x_cond_y
+
+    def joint_entropy(self,x,y):
+        H = 0
+        joint_x_y = self.px_joint_y(x,y)
+        for xi in joint_x_y:
+            for yj in joint_x_y[xi]:
+                if joint_x_y[xi][yj] == 0:
+                    continue
+                H -= joint_x_y[xi][yj] * np.log2(joint_x_y[xi][yj])
+        return H
 
     def cond_entropy(self,x,y):
         #calculate the conditional entropy of a feature x given a feature y (the class)
@@ -122,6 +139,66 @@ class MICalc:
                     continue
                 H = H - p_y[y_i] * p_x_cond_y[x_j][y_i] * np.log2(p_x_cond_y[x_j][y_i])
         return H
+    def cond_joint_entropy(self,x1,x2,y):
+        #conditional entropy of x1 intersect x2 | y
+        if len(x1)!= len(x2) != len(y):
+            raise RuntimeError("Array lengths not equal")
+        cls_x1 =np.unique(x1)
+        cls_x2 = np.unique(x2)
+        cls_y = np.unique(y)
+        p_y = self.get_probs(y)
+        cond_p = {}
+        for i in xrange(len(cls_x1)):
+            cond_p[cls_x1[i]] = {}
+            for j in xrange(len(cls_x2)):
+                cond_p[cls_x1[i]][cls_x2[j]] = {}
+                for k in xrange(len(cls_y)):
+                    cond_p[cls_x1[i]][cls_x2[j]][cls_y[k]] = 0
+        for i in xrange(len(x1)):
+            cond_p[x1[i]][x2[i]][y[i]] += 1
+        for i in cond_p:
+            for j in cond_p[i]:
+                for k in cond_p[i][j]:
+                    cond_p[i][j][k] /= self.data_size
+                    cond_p[i][j][k] /= p_y[k]
+        #now we have p(x1 n x2 | y): calculate the entropy
+        H = 0
+        for y in p_y:
+            for x1 in cond_p:
+                for x2 in cond_p[x1]:
+                    if cond_p[x1][x2][y] == 0:
+                        continue
+                    H -= p_y[y]*cond_p[x1][x2][y] * np.log2(cond_p[x1][x2][y])
+        return H
+    def joint_mutual_info(self,x1,x2,y):
+        return self.joint_entropy(x1,x2) - self.cond_joint_entropy(x1,x2,y)
+
+    def joint_MI_rank(self, max_features = None):
+        #s and f are lists of the feature indicies to score.
+
+        #initialize the algorithm with the highest MI scoring feature.
+        if self.MI is None:
+            self.get_mutual_info()
+        S = [self.MI[0][0]]
+        #selected features: start our algorithm with the attribute with highest MI
+        F = set([self.MI[i][0] for i in range(1,len(self.MI))] ) #the remaining features to be sorted
+        while len(F) > 0:
+            if max_features is not None:
+                if len(S) >= max_features:
+                    break
+            bestJMI = 0
+            bestF = None
+            for f in F:
+                JMIScore = 0
+                for s in S:
+                    JMIScore += self.joint_mutual_info(self.X[:,f],self.X[:,s],self.Y)
+                if JMIScore > bestJMI:
+                    bestF = f
+                    bestJMI = JMIScore
+            S.append(bestF)
+            F.remove(bestF)
+        #S is now a list containing all features (or max_features if specified), ranked by JMI
+        return S
 
     def mutual_info(self,x,y):
         return self.entropy(x) - self.cond_entropy(x,y)
@@ -131,20 +208,28 @@ class MICalc:
         self.MI = []
         for att in xrange(attr):
             self.MI.append( (att, self.mutual_info(self.X[:,att], self.Y)) )
+        self.MI.sort(key = lambda tup: tup[1], reverse = True) #sort in decending order
+
 
     def printMutualInfo(self, labels = None):
-        print "Feature                        | Mutual Information"
-        print "____________________________________________________"
-        self.MI.sort(key = lambda tup: tup[1], reverse = True)
+        if self.MI is None:
+            self.get_mutual_info()
+
+        JMI_rank = self.joint_MI_rank()
+        print "Feature                        | Mutual Information | JMI Rank"
+
+        print "_______________________________________________________________"
         _, attr = self.X.shape
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
             os.Exit(0)
         for feature,mi in self.MI:
             if labels is None:
-                print("{:<31}| {:2.6f}".format(feature,mi))
+                print("{:<31}| {:2.6f}           | {:2d}".format(feature,mi,JMI_rank.index(feature)+1))
+                #the +1 just makes the ranks 1 indexed instead of zero indexed, to match Lyon et. al.
             else:
-                print("{:<31}| {:2.6f}".format(labels[feature],mi))
+                print("{:<31}| {:2.6f}           | {:2d}".format(labels[feature],mi, JMI_rank.index(feature)+1))
+
 
     def writeToFile(self, filename, labels = None):
         _, attr = self.X.shape
