@@ -1,0 +1,24 @@
+Feature                           | Mutual Information | JMI Rank
+__________________________________________________________________
+Pulse Width                       | 0.084574           |  1
+16                                | 0.081923           |  3
+offset of profile hist from 0     | 0.080457           |  4
+offset of 11 and grad. hist       | 0.079821           |  6
+best SNR                          | 0.073308           |  2
+best dm                           | 0.069059           |  9
+Chi^2 2x gaus                     | 0.067835           |  7
+chi^2 profile sin^2               | 0.055290           |  5
+number prof. peaks                | 0.050393           |  8
+best period                       | 0.033725           | 10
+14                                | 0.026064           | 11
+corr. coeff. avg across bands     | 0.017081           | 13
+area under pulse prof. - mean     | 0.010084           | 14
+corr. coef. sum across sub-bands  | 0.002183           | 15
+chi^2 of DM-SNR fit               | 0.001337           | 18
+15                                | 0.000890           | 12
+FWHM gaus                         | 0.000721           | 17
+max(profile hist)/max(gaus)       | 0.000682           | 16
+RMS. peak pos.                    | 0.000645           | 19
+chi^2 profile/sine                | 0.000090           | 20
+chi^2 profile gaus                | 0.000053           | 21
+FWHM 2xGaus                       | 0.000008           | 22

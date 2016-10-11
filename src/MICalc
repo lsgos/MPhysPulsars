@@ -60,7 +60,7 @@ class MICalc:
         if n_bins > 0:
             self.bin_x(n_bins = n_bins)
         self.get_mutual_info()
-
+        self.JMI_rank = self.joint_MI_rank()
     def bin_x(self, n_bins = 10):
         #discretize x into equal width bins
         _,attr = self.X.shape
@@ -215,20 +215,19 @@ class MICalc:
         if self.MI is None:
             self.get_mutual_info()
 
-        JMI_rank = self.joint_MI_rank()
-        print "Feature                        | Mutual Information | JMI Rank"
+        print "Feature                           | Mutual Information | JMI Rank"
 
-        print "_______________________________________________________________"
+        print "__________________________________________________________________"
         _, attr = self.X.shape
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
             os.Exit(0)
         for feature,mi in self.MI:
             if labels is None:
-                print("{:<31}| {:2.6f}           | {:2d}".format(feature,mi,JMI_rank.index(feature)+1))
+                print("{:<34}| {:2.6f}           | {:2d}".format(feature,mi,self.JMI_rank.index(feature)+1))
                 #the +1 just makes the ranks 1 indexed instead of zero indexed, to match Lyon et. al.
             else:
-                print("{:<31}| {:2.6f}           | {:2d}".format(labels[feature],mi, JMI_rank.index(feature)+1))
+                print("{:<34}| {:2.6f}           | {:2d}".format(labels[feature],mi, self.JMI_rank.index(feature)+1))
 
 
     def writeToFile(self, filename, labels = None):
@@ -236,12 +235,15 @@ class MICalc:
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
             os.Exit(0)
+	
+	#sort MI back to feature order
+	self.MI.sort(key = lambda tup: tup[0])
         with open(filename,'w') as f:
             for feature,mi in self.MI:
                 if labels is None:
-                    f.write("{},{}\n".format(feature,mi))
+                    f.write("{},{},{}\n".format(feature,mi,self.JMI_rank.index(feature)+1))
                 else:
-                    f.write("{},{}\n".format(labels[feature],mi))
+                    f.write("{},{},{}\n".format(labels[feature],mi,self.JMI_rank.index(feature)+1))
 
 
 

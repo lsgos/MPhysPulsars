@@ -1,0 +1,10 @@
+Feature                           | Mutual Information | JMI Rank
+__________________________________________________________________
+prof.kurt                         | 0.072607           |  1
+prof. mean                        | 0.064594           |  3
+prof. skew                        | 0.062577           |  4
+DM. mean                          | 0.028218           |  5
+DM. kurt                          | 0.020698           |  6
+DM skew                           | 0.013115           |  8
+prof.stddev                       | 0.006947           |  7
+DM. stdev                         | 0.004051           |  2
