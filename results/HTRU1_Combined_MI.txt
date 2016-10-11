@@ -1,0 +1,32 @@
+]0;IPython: Combined Features/Lyon et al. (2015) and Thornton et al. (2013) - 30 FeaturesFeature                           | Mutual Information | JMI Rank
+__________________________________________________________________
+best dm                           | 0.075218           |  1
+prof.kurt                         | 0.072607           |  2
+prof. mean                        | 0.064594           |  5
+Pulse Width                       | 0.064327           |  4
+best SNR                          | 0.063345           |  6
+prof. skew                        | 0.062578           |  7
+best period                       | 0.062129           |  8
+area under pulse prof. - mean     | 0.049115           |  3
+chi^2 profile sin^2               | 0.047558           |  9
+number prof. peaks                | 0.031833           | 10
+Chi^2 2x gaus                     | 0.031304           | 11
+DM. mean                          | 0.028219           | 12
+max(profile hist)/max(gaus)       | 0.024342           | 15
+chi^2 of DM-SNR fit               | 0.022568           | 13
+DM. kurt                          | 0.020698           | 16
+corr. coeff. avg across bands     | 0.017353           | 17
+DM skew                           | 0.013115           | 19
+corr. coef. sum across sub-bands  | 0.008488           | 18
+prof.stddev                       | 0.006947           | 20
+DM. stdev                         | 0.004051           | 21
+offset of 11 and grad. hist       | 0.003340           | 23
+14                                | 0.003154           | 22
+15                                | 0.002897           | 14
+16                                | 0.002251           | 24
+FWHM 2xGaus                       | 0.000071           | 25
+chi^2 profile gaus                | 0.000032           | 27
+FWHM gaus                         | 0.000026           | 26
+chi^2 profile/sine                | 0.000022           | 28
+offset of profile hist from 0     | 0.000001           | 30
+RMS. peak pos.                    | 0.000001           | 29

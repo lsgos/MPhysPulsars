@@ -10,6 +10,10 @@ import argparse
 import numpy as np
 import re
 import os
+import sys
+
+import ipdb
+
 
 INSTALLPATH = os.path.join('/','home','lewis','MPhysProject-s1','src')
 
@@ -23,7 +27,10 @@ class CSV:
                     continue
                 # Split on comma since ARFF data is in CSV format.
                 components = line.split(",")
-                features = [float(x) for x in components[0:len(components)-1]]
+                try:
+                    features = [float(x) for x in components[0:len(components)-1]]
+                except:
+                    ipdb.set_trace()
                 label    = [int(x)   for x in components[len(components)-1:len(components)]]
                 X.append(features)
                 Y.append(label)
@@ -221,7 +228,7 @@ class MICalc:
         _, attr = self.X.shape
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
-            os.Exit(0)
+            sys.exit(0)
         for feature,mi in self.MI:
             if labels is None:
                 print("{:<34}| {:2.6f}           | {:2d}".format(feature,mi,self.JMI_rank.index(feature)+1))
@@ -234,7 +241,7 @@ class MICalc:
         _, attr = self.X.shape
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
-            os.Exit(0)
+            sys.exit(0)
 	
 	#sort MI back to feature order
 	self.MI.sort(key = lambda tup: tup[0])
@@ -267,6 +274,8 @@ if args.labels is not None:
         args.labels = os.path.join(INSTALLPATH,'resources','lyonlabels.csv')
     elif args.labels == 'Thornton':
         args.labels = os.path.join(INSTALLPATH,'resources','thorntonlabels.csv')
+    elif args.labels == 'Combined':
+        args.labels = os.path.join(INSTALLPATH,'resources','combinedlabels.csv')
 
     labels = read_label_file(args.labels)
 else:
@@ -274,7 +283,7 @@ else:
 
 if allowed_filenames.match(args.filename) is None:
     print "Target file must be in .csv format"
-    os.Exit(0)
+    sys.exit(0)
 
 csv = CSV()
 x,y = csv.read(args.filename)
