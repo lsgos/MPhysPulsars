@@ -30,30 +30,30 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     profile_gen.dump_profile(args.prof) #creates a profile file
-    par_gen.make_par(args.par,args.dmlo,args.dmhi,args.flo,args.fhi) #CHANGE
+    DM,_ = par_gen.make_par(args.par,args.dmlo,args.dmhi,args.flo,args.fhi) #CHANGE
     SNR = random.random() * (args.snrhi - args.snrlo) + args.snrlo
     #get MJD
 
     try:
-        mjd_start = float(check_output("header",args.fil,"-tstart"))
-        seconds_len = float(check_output("header", args.fil, "-tobs"))
+        mjd_start = float(subprocess.check_output(["header",args.fil,"-tstart"]))
+        seconds_len = float(subprocess.check_output(["header", args.fil, "-tobs"]))
         mjd_end = mjd_start + seconds_to_mjd(seconds_len)
-        tempo2optstring = 'parkes '+str(mjd_start)+' '+str(mjd_end)+'1000 2000 16 2 3600'
-        subprocess.check_call("tempo2","-f",args.par,"-pred",tempo2optstring)
+        tempo2optstring = 'parkes '+str(mjd_start)+' '+str(mjd_end)+' 1000 2000 16 2 3600'
+        subprocess.check_call(["tempo2","-f",args.par,"-pred",tempo2optstring])
 
-        injected_fil = subprocess.check_output("inject_pulsar",
+        injected_fil = subprocess.check_output(["inject_pulsar",
                                     "--pred",
-                                    "t2pred.dat"
+                                    "t2pred.dat",
                                     "--prof",
                                     args.prof,
                                     args.fil,
                                     "-s",
-                                     str(SNR))
+                                     str(SNR)])
 
         with open(args.outfil,'w') as f:
             f.write(injected_fil) #dump the output of inject_pulsar to a file
 
-            subprocess.check_call("dspsr",args.outfil,"-b","-128","-t8","U1","-L30","-A","-D", str(DM),"-P","t2pred.dat")
+            subprocess.check_call(["dspsr",args.outfil,"-b","-128","-t8","U1","-L30","-A","-D", str(DM),"-P","t2pred.dat"])
 
 
     except OSError as e:

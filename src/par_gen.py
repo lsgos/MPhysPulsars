@@ -15,7 +15,7 @@ def make_par(filename,dmlow,dmhigh,f0low,f0high):
         f.write("PSR J0000-0000 \nRAJ 00:00:00 \nDECJ 00:00:00 \nPEPOCH 55000 \n")
         f.write("F0 "+ str(f0)+"\n"+"DM "+str(dm)+"\n")
         f.write("UNITS TBD")
-
+    return dm,f0
 
 if __name__ == "__main__":
     filename="test.txt"
