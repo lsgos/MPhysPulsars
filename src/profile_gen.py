@@ -61,6 +61,7 @@ def make_prof():
             return out
 
 if __name__=="__main__":
+    #print to stdout
     out = make_prof()
     for o in out:
        print o
