@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #get MJD
 
     try:
-        mjd_start = float(check_output("header",args.fil,"-tstart")
+        mjd_start = float(check_output("header",args.fil,"-tstart"))
         seconds_len = float(check_output("header", args.fil, "-tobs"))
         mjd_end = mjd_start + seconds_to_mjd(seconds_len)
         tempo2optstring = 'parkes '+str(mjd_start)+' '+str(mjd_end)+'1000 2000 16 2 3600'
@@ -50,10 +50,10 @@ if __name__ == "__main__":
                                     "-s",
                                      str(SNR))
 
-    with open(args.outfil,'w') as f:
-        f.write(injected_fil) #dump the output of inject_pulsar to a file
+        with open(args.outfil,'w') as f:
+            f.write(injected_fil) #dump the output of inject_pulsar to a file
 
-        subprocess.check_call("dspsr",args.outfil,"-b","-128","-t8","U1","-L30","-A","-D", str(DM),"-P","t2pred.dat")
+            subprocess.check_call("dspsr",args.outfil,"-b","-128","-t8","U1","-L30","-A","-D", str(DM),"-P","t2pred.dat")
 
 
     except OSError as e:
