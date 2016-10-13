@@ -3,3 +3,4 @@ JACS-ML-Tutorial/
 PulsarFeatureLab/
 *.~lock.*
 .~lock.*
+*.pyc

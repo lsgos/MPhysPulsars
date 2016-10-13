@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 """
 A program to generate a simulated pulsar profile as a .asc file to use an an
-input for the inject_pulsar program.
+input for the inject_pulsar program. Can be imported as a module or used from
+the command line with unix pipes as preferred. 
 Authors: Mike Keith, Lewis Smith, Alex Lisboa-Wright
 """
 
@@ -20,10 +21,12 @@ def make_prof():
         pass
     while True:
         """
-        this rigmarole is to avoid files containing NANs: if width is a very small number the exp on line 52 may overflow.
-        to avoid this, catch numpy warnings as exceptions and retry the block with different random numbers until
-        a non nan result is obtained. The probability that the result will be nan indefinitly, thus making this program
-        run forever,is non-zero but considered to be neglible.
+        this rigmarole is to avoid files containing NANs: if width is a very
+        small number the exp on line 52 may overflow.to avoid this, catch numpy
+        warnings as exceptions and retry the block with different random numbers
+        until a non nan result is obtained. The probability that the result will
+        be nan indefintly, thus making this program run forever,is non-zero
+        but considered to be neglible.
         """
         try:
             out=np.zeros(1024)
@@ -60,8 +63,13 @@ def make_prof():
         except Success:
             return out
 
+def dump_profile(filename):
+    out = make_prof()
+    with open(filename,'w') as f:
+         for o in out:
+             f.write(str(o)+'\n')
+
 if __name__=="__main__":
-    #print to stdout
     out = make_prof()
     for o in out:
        print o
