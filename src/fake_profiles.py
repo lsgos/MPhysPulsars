@@ -59,6 +59,6 @@ if __name__ == "__main__":
     except OSError as e:
         print "OS Error detected: are all programs installed correctly?"
         raise e
-    except CalledProcessError as e:
+    except subprocess.CalledProcessError as e:
         print "A subprocess returned a non-zero error code: check this script or the target files?"
         raise e
