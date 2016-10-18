@@ -10,6 +10,8 @@ import os
 import argparse
 import re
 
+p_tol = 0.5
+dm_tol = 0.5
 
 
 def parse_par_file(f):
@@ -60,18 +62,18 @@ if __name__ == "__main__":
             target_p,target_dm = parse_par_file(f)
 
         with open(lis_name) as f:
-            bestfname,bestloss = None,None
+            candnames = []
             for line in f:
                 fname,snr,period,dm = parse_lis_line(line)
-                loss = score_cand(target_p,target_dm,period,dm)
-                if bestloss is None or loss < bestloss:
-
-                    bestfname = fname
-                    bestloss = loss
+                if (target_dm - dm_tol) < dm < (target_dm + dm_tol) and (target_p - p_tol) < period < (target_p + p_tol):
+                    loss = score_cand(target_p,target_dm,period,dm)
+                    candnames.append((fname,loss))
 
     except IOError as e:
         print "Required files not found: does the directory contain the processor output?"
         raise e
     except RuntimeError as e:
         raise e
-    print bestfname #print candidate to stdout
+    candnames.sort(key = lambda x: x[1])
+    for n,_ in candnames:
+        print n #print to stdout in decreasing order of likehood
