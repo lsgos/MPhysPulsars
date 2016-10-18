@@ -4,3 +4,5 @@ PulsarFeatureLab/
 *.~lock.*
 .~lock.*
 *.pyc
+*.tar.gz
+testdata/
