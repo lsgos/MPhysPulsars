@@ -10,7 +10,6 @@ import os
 import argparse
 import re
 
-import ipdb
 
 
 def parse_par_file(f):
@@ -52,9 +51,10 @@ if __name__ == "__main__":
     parser.add_argument("dir_name", help = "The target directory, containing the output of the processing pipeline and injected data files")
 
     args = parser.parse_args()
+    dir_name = os.path.join(args.dir_name,'')
 
-    lis_name = os.path.join(args.dir_name, args.dir_name[:-1] + '.fil.lis')
-    par_name = os.path.join(args.dir_name,'fake.par')
+    lis_name = os.path.join(dir_name, dir_name[:-1] + '.fil.lis')
+    par_name = os.path.join(dir_name,'fake.par')
     try:
         with open(par_name) as f:
             target_p,target_dm = parse_par_file(f)
@@ -65,7 +65,7 @@ if __name__ == "__main__":
                 fname,snr,period,dm = parse_lis_line(line)
                 loss = score_cand(target_p,target_dm,period,dm)
                 if bestloss is None or loss < bestloss:
-                    ipdb.set_trace()
+
                     bestfname = fname
                     bestloss = loss
 
