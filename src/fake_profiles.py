@@ -38,22 +38,25 @@ if __name__ == "__main__":
         mjd_start = float(subprocess.check_output(["header",args.fil,"-tstart"]))
         seconds_len = float(subprocess.check_output(["header", args.fil, "-tobs"]))
         mjd_end = mjd_start + seconds_to_mjd(seconds_len)
-        tempo2optstring = 'parkes '+str(mjd_start)+' '+str(mjd_end)+' 1000 2000 16 2 3600'
+        tempo2optstring = 'parkes '+str(mjd_start-0.05)+' '+str(mjd_end+0.05)+' 1000 2000 16 2 3600'
         subprocess.check_call(["tempo2","-f",args.par,"-pred",tempo2optstring])
 
-        injected_fil = subprocess.check_output(["inject_pulsar",
-                                    "--pred",
-                                    "t2pred.dat",
-                                    "--prof",
-                                    args.prof,
-                                    args.fil,
-                                    "-s",
-                                     str(SNR)])
+	with open(args.outfil,'w') as f:
 
-        with open(args.outfil,'w') as f:
-            f.write(injected_fil) #dump the output of inject_pulsar to a file
+		injected_fil = subprocess.check_call(["inject_pulsar",
+					    "--pred",
+					    "t2pred.dat",
+					    "--prof",
+					    args.prof,
+					    args.fil,
+					    "-s",
+					     str(SNR)],stdout=f)
 
-            subprocess.check_call(["dspsr",args.outfil,"-b","-128","-t8","-U1","-L30","-A","-D", str(DM),"-P","t2pred.dat"])
+
+	with open("fake.snr",'w') as f:
+		f.write("%f\n"%SNR)
+
+	subprocess.check_call(["dspsr",args.outfil,"-b","-128","-t8","-U1","-L30","-A","-D", str(DM),"-P","t2pred.dat","-j","'F 16'", "-O","fake"])
 
 
     except OSError as e:
