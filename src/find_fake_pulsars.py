@@ -10,8 +10,11 @@ import os
 import argparse
 import re
 
-p_tol = 0.5
-dm_tol = 0.5
+p_tol = 1
+dm_tol = 1
+
+fil_re= re.compile('.*fil\.lis')
+par_re= re.compile('.*fake\.par')
 
 
 def parse_par_file(f):
@@ -48,18 +51,15 @@ def score_cand(target_p,target_dm,p,dm):
     return loss
 
 
+
 def process_directory(dir_name):
-    dir_name = os.path.join(args.dir_name,'')
-    class InvalidDirFormat(Exception):
-        pass
+    lis_names = [l for l in os.listdir(dir_name) if fil_re.match(l) is not None]
+    par_names = [p for p in os.listdir(dir_name) if par_re.match(p) is not None]
 
-    lis_name = os.path.join(dir_name, dir_name[:-1] + '.fil.lis')
-    par_name = os.path.join(dir_name,'fake.par')
-
-    if not os.path.exists(lis_name) or not os.path.exists(par_name):
-        raise InvalidDirFormat
-
-
+    if len(lis_names) != 1 or len(par_names) != 1:
+        return False
+    lis_name = os.path.join(dir_name,lis_names[0])
+    par_name = os.path.join(dir_name,par_names[0])
     try:
         with open(par_name) as f:
             target_p,target_dm = parse_par_file(f)
@@ -78,24 +78,29 @@ def process_directory(dir_name):
     except RuntimeError as e:
         raise e
     candnames.sort(key = lambda x: x[1])
+    if len(candnames) == 0:
+        print('## No matching pulsars found in directory {}'.format(dir_name))
+
     for n,_ in candnames:
         print n #print to stdout in decreasing order of likehood
+    return True
 
-    def search_directories(dir_name):
-        try:
-            process_directory(dir_name)
-        except InvalidDirFormat:
+def search_directories(dir_name):
 
-            for d in os.listdir(dir_name):
-                if os.path.isdir(os.path.join(dir_name,d)):
-                    search_directories(os.path.join(dir_name,d))
-                else:
-                    continue
-        
+    if process_directory(dir_name):
+        return
+
+    for d in os.listdir(dir_name):
+        newdir = os.path.join(dir_name,d)
+        if os.path.isdir(newdir):
+            search_directories(newdir)
+        else:
+            continue
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "A script to filter directories containing injected pulsar data in order to find the 'pulsars', and return their filenames")
     parser.add_argument("dir_name", help = "The target directory, containing the output of the processing pipeline and injected data files")
 
     args = parser.parse_args()
-    process_directory(args.dir_name)
+    search_directories(args.dir_name)
