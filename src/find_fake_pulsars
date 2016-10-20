@@ -82,7 +82,8 @@ def process_directory(dir_name):
         print('## No matching pulsars found in directory {}'.format(dir_name))
 
     for n,_ in candnames:
-        print n #print to stdout in decreasing order of likehood
+        print os.path.join(dir_name,n) #print to stdout in decreasing order of likehood
+        
     return True
 
 def search_directories(dir_name):
