@@ -48,15 +48,18 @@ def score_cand(target_p,target_dm,p,dm):
     return loss
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description = "A script to filter directories containing injected pulsar data in order to find the 'pulsars', and return their filenames")
-    parser.add_argument("dir_name", help = "The target directory, containing the output of the processing pipeline and injected data files")
-
-    args = parser.parse_args()
+def process_directory(dir_name):
     dir_name = os.path.join(args.dir_name,'')
+    class InvalidDirFormat(Exception):
+        pass
 
     lis_name = os.path.join(dir_name, dir_name[:-1] + '.fil.lis')
     par_name = os.path.join(dir_name,'fake.par')
+
+    if not os.path.exists(lis_name) or not os.path.exists(par_name):
+        raise InvalidDirFormat
+
+
     try:
         with open(par_name) as f:
             target_p,target_dm = parse_par_file(f)
@@ -77,3 +80,22 @@ if __name__ == "__main__":
     candnames.sort(key = lambda x: x[1])
     for n,_ in candnames:
         print n #print to stdout in decreasing order of likehood
+
+    def search_directories(dir_name):
+        try:
+            process_directory(dir_name)
+        except InvalidDirFormat:
+
+            for d in os.listdir(dir_name):
+                if os.path.isdir(os.path.join(dir_name,d)):
+                    search_directories(os.path.join(dir_name,d))
+                else:
+                    continue
+        
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description = "A script to filter directories containing injected pulsar data in order to find the 'pulsars', and return their filenames")
+    parser.add_argument("dir_name", help = "The target directory, containing the output of the processing pipeline and injected data files")
+
+    args = parser.parse_args()
+    process_directory(args.dir_name)
