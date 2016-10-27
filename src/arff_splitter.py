@@ -9,7 +9,10 @@ arff_re = re.compile(".*\.arff")
 
 def parse_arff_header(f):
     header = []
-    for line in f:
+
+    while True:
+        last_pos = f.tell()
+        line = f.readline()
         s = line.strip()
         if s == "":
             continue #ignore blank lines
@@ -17,6 +20,7 @@ def parse_arff_header(f):
             #while parsing the header
             header.append(line)
         else:
+            f.seek(last_pos) #unread the line
             break
     return header
 
