@@ -32,12 +32,12 @@ parser.add_argument('files', nargs='+', help = 'list of files to concatenate')
 
 args = parser.parse_args()
 header = None
+lines = []
 for filename in args.files:
     with open(filename) as f:
         if header is None:
-            header = parse_arff_header(f)        
+            header = parse_arff_header(f)
         for line in f:
-            lines = []
             # Comments and attribute lines should be ignored.
             if(line.startswith("@") or line.startswith("%")):
                 continue
@@ -45,13 +45,9 @@ for filename in args.files:
                 continue
             fields = line.split(',')
             lines.append(line)
-    
-            
+
+
 for head in header:
     print (head, end = "")
 for line in lines:
     print(line, end="")
-        
-
-    
-    
