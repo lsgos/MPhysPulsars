@@ -246,7 +246,7 @@ class PulsarFeatureLab:
 
             # Add class label information to the ARFF file, for those features we can
             # produce an ARFF file for.
-            if(self.feature_type > 0 and self.feature_type < 7):
+            if(self.feature_type > 0 and self.feature_type < 7) or self.feature_type == 9:
                 utils.appendToFile(self.out, "@relation Pulsar_Feature_Data_Type_"+ str(self.feature_type)+"\n")
 
             if(self.feature_type == 1):

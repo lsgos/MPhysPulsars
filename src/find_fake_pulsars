@@ -10,8 +10,9 @@ import os
 import argparse
 import re
 
-p_tol = 1
-dm_tol = 1
+# tolerance on parameters
+p_tol = 0.5
+dm_tol = 0.5
 
 fil_re= re.compile('.*fil\.lis')
 par_re= re.compile('.*fake\.par')

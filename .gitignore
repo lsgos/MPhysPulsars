@@ -6,3 +6,4 @@ PulsarFeatureLab/
 *.pyc
 *.tar.gz
 testdata/
+*~
