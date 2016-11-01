@@ -30,11 +30,11 @@ def make_arff_name(name):
     return name
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-    description = "Split an arff file by period (assumed to be the first data field) a file target containing all datapoints that pass the condition and another, rest, containing the remaining data")
-    parser.add_argument("--msp","-t", help = "arff file containing all datapoints that passed the msp and general pulsar conditions", default = "target.arff")
+    description = "Split an arff file by period (assumed to be the first data field) a file, msp, containing all datapoints that pass both conditions, another, pulsar, that fails the period condition but passes the pulsar condition and another, noise, containing the remaining data")
+    parser.add_argument("--msp","-t", help = "arff file containing all datapoints that passed the msp and general pulsar conditions", default = "msp.arff")
     parser.add_argument("--pulsar","-u", help = "arff file containing all datapoints that failed the msp condition but passed the pulsar condition", default = "pulsar.arff")
     parser.add_argument("--noise","-r", help = "arff file containing all datapoints that failed both conditions", default = "noise.arff")
-    parser.add_argument("--splitthresh","-s", help = "Value to split pulsars by", type = float)
+    parser.add_argument("--splitthresh","-s", help = "Value to split pulsars by", type = float, default = 31.0)
     parser.add_argument("--periodfield","-p", help = "Period field (default 1)")
     parser.add_argument("file", help = "the file to process (must be in arff format)")
 
