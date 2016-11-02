@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import argparse
 import os
+import ast
 
 from JACS_utils.ARFF import ARFF
 from JACS_utils.ClassifierStats import ClassifierStats
@@ -79,6 +80,8 @@ def _paralleliser(clf_tup):
     return (name,calculate_metrics(clf, args.k_folds, train_x, train_y))
 
 if __name__ == "__main__":
+    valid_features = set([0,1,2,3,4,5,6,7,8]) #the allowed features
+
     parser = argparse.ArgumentParser(description = "Evaluates the perfomance of several classifiers on a pulsar dataset in .arff format\n. \
                                             Classifiers used: \
                                             CART Decision Tree, \
@@ -88,18 +91,30 @@ if __name__ == "__main__":
                                             Random Forest, \
                                             AdaBoost")
     parser.add_argument("train", help = "Training set. Should be an arff file")
-    parser.add_argument("--ignore_period", type = bool, default = True, help = "By default, assume the period is the first field of the arff file, and ignore it (default True)")
+    parser.add_argument("--select_features",help = "Features to train the classification on. By default use all except the period. Period is field 0, fields 1-8 are those from Lyon et. al. (default = [1,2,3,4,5,6,7,8])", default = "[1,2,3,4,5,6,7,8]")
     parser.add_argument("--save_classifiers", help = "Save trained classifiers to disk using joblib in this path location if provided")
     parser.add_argument("--k_folds","-k", default = 5, help = "Number of folds to use for cross validation (default 5)")
     parser.add_argument("--n_jobs","-j", default = 4, help = "Number of cores to parallelise over")
     args = parser.parse_args()
 
+    try:
+        selected_features = ast.literal_eval(args.select_features)
+        #test to see if the features are validation
+        if len( set(selected_features) - valid_features) > 0:
+            raise ValueError
+
+    except ValueError as v:
+        print ("Unable to parse selected features: please specify a valid list of integers in the range [0,8]")
+        print ("Feature 0 = Period, Features 1-8: See Lyon et. al.")
+        quit()
+
     arff_reader = ARFF()
 
     train_x, train_y = arff_reader.read(args.train)
 
-    if args.ignore_period:
-        train_x = train_x[:,1:] #remove the first feature: this is included to sort the pulsars out, not to fit on
+    #select features
+    train_x = train_x[:,selected_features]
+
 
     #fit classifiers
     classifiers = []
