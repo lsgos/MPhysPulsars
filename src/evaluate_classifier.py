@@ -61,8 +61,6 @@ def calculate_metrics(classifier, k_folds, x, y, parallel_workers,shuffle = True
 def _calculate_metrics(classifier,x,y, split_tup):
     train_index, test_index = split_tup
 
-    clf = clone(classifier)
-
     clf = clone(classifier) #make sure they are not modified outside the loop
 
     x_train, x_test = x[train_index], x[test_index]
