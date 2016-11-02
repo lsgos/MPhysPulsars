@@ -52,10 +52,10 @@ def get_metrics(C, datalen):
     metrics.append(C.getAccuracy())
     return metrics
 
-def calculate_metrics(classifier, k_folds, x, y, n_jobs,shuffle = True):
+def calculate_metrics(classifier, k_folds, x, y, parallel_workers,shuffle = True):
 
     skf = StratifiedKFold(n_splits = k_folds, shuffle = shuffle)
-    metrics = joblib.Parallel(n_jobs = n_jobs)(joblib.delayed(_calculate_metrics)(classifier,x,y,split) for split in skf.split(x,y))
+    metrics = parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,split) for split in skf.split(x,y))
     return map(lambda x: sum(x) / len(x), zip(*metrics))
 
 def _calculate_metrics(classifier,x,y, split_tup):
@@ -111,7 +111,8 @@ if __name__ == "__main__":
     classifiers.append(("SVM",Pipeline([('scaler', StandardScaler()), ('svc',SVC(class_weight = 'balanced') )])))
     classifiers.append(("Random_Forest",RandomForestClassifier() ))
     classifiers.append(("AdaBoost", AdaBoostClassifier() ))
-    metrics = [(name,calculate_metrics(clf, args.k_folds, train_x, train_y, args.n_jobs) ) for name, clf in classifiers]
+    with joblib.Parallel(n_jobs = args.n_jobs) as parallel_workers:
+        metrics = [(name,calculate_metrics(clf, args.k_folds, train_x, train_y, parallel_workers) ) for name, clf in classifiers]
     #print metrics
     for name, metric in metrics:
         print("{}:".format(name))
