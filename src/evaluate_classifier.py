@@ -12,8 +12,6 @@ import os
 from JACS_utils.ARFF import ARFF
 from JACS_utils.ClassifierStats import ClassifierStats
 
-from joblib import Parallel, delayed
-
 from sklearn.base import clone
 from sklearn.externals import joblib
 
@@ -57,7 +55,7 @@ def get_metrics(C, datalen):
 def calculate_metrics(classifier, k_folds, x, y, n_jobs,shuffle = True):
 
     skf = StratifiedKFold(n_splits = k_folds, shuffle = shuffle)
-    metrics = Parallel(n_jobs = n_jobs)(delayed(_calculate_metrics)(classifier,x,y,split) for split in skf.split(x,y))
+    metrics = joblib.Parallel(n_jobs = n_jobs)(joblib.delayed(_calculate_metrics)(classifier,x,y,split) for split in skf.split(x,y))
     return map(lambda x: sum(x) / len(x), zip(*metrics))
 
 def _calculate_metrics(classifier,x,y, split_tup):
