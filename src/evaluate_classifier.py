@@ -102,7 +102,7 @@ if __name__ == "__main__":
     parser.add_argument("--k_folds","-k",
         default = 5, help = "Number of folds to use for cross validation (default 5)")
     parser.add_argument("--n_jobs","-j",
-        default = 4, help = "Number of cores to utilize (recommended: ($nproc), default 4)")
+        default = 4, help = "Number of cores to utilize (recommended: ($nproc), default 4)",type = int)
     args = parser.parse_args()
 
     try:
