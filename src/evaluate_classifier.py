@@ -34,7 +34,7 @@ from sklearn.ensemble import AdaBoostClassifier
 
 def print_metrics(metrics):
     metric_labels = ["G-Mean","F-Score","Recall","Precision","Specificity","FPR","Accuracy"]
-    for l,m in zip(metric_labels, metric):
+    for l,m in zip(metric_labels, metrics):
         print("{} {}, ".format(l,m), end = '')
     print("")
 
@@ -53,7 +53,7 @@ def get_metrics(C, datalen):
     metrics.append(C.getAccuracy())
     return metrics
 
-def calculate_metrics(classifier, k_folds, x, y, parallel_workers,shuffle = True):
+def calculate_metrics_k_fold(classifier, k_folds, x, y, parallel_workers,shuffle = True):
 
     skf = StratifiedKFold(n_splits = k_folds, shuffle = shuffle)
     #farm jobs out to the parallel workers
@@ -71,7 +71,11 @@ def _calculate_metrics(classifier,x,y, split_tup):
 
     clf.fit(x_train, y_train)
     #calculate cross validation metrics
-    y_pred = clf.predict(x_test)
+    return fit_metrics(clf,x_test,y_test)
+
+def fit_metrics(classifier, x_test, y_test):
+    #calculate statistics for a trained classifier on a test set
+    y_pred = classifier.predict(x_test)
     cm = confusion_matrix(y_test, y_pred)
     stats = ClassifierStats(cm)
     stats.calculate()
@@ -92,7 +96,10 @@ if __name__ == "__main__":
                                     Random Forest, \
                                     AdaBoost")
     parser.add_argument("train", help = "Training set. Should be an arff file")
-    parser.add_argument("--select_features",help = "Features to train the \
+    parser.add_argument("--test", help = "Testing set (optional). If this argument \
+                        is supplied, the classifiers trained on the training set \
+                        are tested on this set")
+    parser.add_argument("--select_features","-f",help = "Features to train the \
                     classification on. By default use all except the period. \
                     Period is field 0, fields 1-8 are those from Lyon et. al.\
                      (default = [1,2,3,4,5,6,7,8])", default = "[1,2,3,4,5,6,7,8]")
@@ -118,9 +125,11 @@ if __name__ == "__main__":
         quit()
 
     arff_reader = ARFF()
-
-    train_x, train_y = arff_reader.read(args.train)
-
+    try:
+        train_x, train_y = arff_reader.read(args.train)
+    except IOError as e:
+        print("Cannot open training data file: does it exist?")
+        quit()
     #select features
     train_x = train_x[:,selected_features]
 
@@ -136,17 +145,31 @@ if __name__ == "__main__":
 
     #cross validation is embarrassingly parallel: parallelize the calculation for speed, re-using the worker pool.
     with joblib.Parallel(n_jobs = args.n_jobs) as parallel_workers:
-        metrics = [(name,calculate_metrics(clf, args.k_folds, train_x, train_y, parallel_workers) ) for name, clf in classifiers]
+        metrics = [(name,calculate_metrics_k_fold(clf, args.k_folds, train_x, train_y, parallel_workers) ) for name, clf in classifiers]
     #print metrics
+    print("\t----------CROSS VALIDATION RESULTS--------------")
     for name, metric in metrics:
         print("{}:".format(name))
-        print_metrics(metrics)
+        print_metrics(metric)
 
+    if args.save_classifiers is not None or args.test is not None:
+        #fit the classifiers on the whole training set
+        for name,clf in classifiers:
+            #fit on the whole training set and save the classifier
+            clf.fit(train_x,train_y)
 
     if args.save_classifiers is not None:
         if not os.path.exists(args.save_classifiers):
             raise IOError("Cannot find path specified to save classifiers to")
-        for name,clf in classifiers:
-            #fit on the whole training set and save the classifier
-            clf.fit(train_x,train_y)
             joblib.dump(clf, os.path.join(args.save_classifiers,(name+".pkl")))
+    if args.test is not None:
+        try:
+            test_x, test_y = arff_reader.read(args.test)
+            test_x = test_x[:,selected_features]
+
+        except IOError as e:
+            print("Cannot open training file: does it exist?")
+        test_metrics = [(name, clf.score(test_x,test_y)) for name,clf in classifiers]
+        print("\t----------TEST SET RESULTS (Accuracy)--------------")
+        for name,metric in test_metrics:
+            print("{}: {}".format(name, metric))
