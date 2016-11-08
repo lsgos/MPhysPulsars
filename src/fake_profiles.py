@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     profile_gen.dump_profile(args.prof) #creates a profile file
-    DM,_ = par_gen.make_par(args.par,args.dmlo,args.dmhi,args.plo,args.phi) 
+    DM,_ = par_gen.make_par(args.par,args.dmlo,args.dmhi,args.plo,args.phi)
     SNR = random.random() * (args.snrhi - args.snrlo) + args.snrlo
     #get MJD
 

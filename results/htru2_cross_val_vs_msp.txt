@@ -1,0 +1,19 @@
+	----------CROSS VALIDATION RESULTS--------------
+[34mCART_tree[0m:
+[36mG-Mean[0m 0.8925 +/- 0.0116, [36mF-Score[0m 0.8189 +/- 0.0150, [36mRecall[0m 0.8109 +/- 0.0207, [36mPrecision[0m 0.8273 +/- 0.0184, [36mSpecificity[0m 0.9826 +/- 0.0018, [36mFPR[0m 0.0158 +/- 0.0017, [36mAccuracy[0m 0.9665 +/- 0.0029, 
+Accuracy (recall) on labelled MSPs only: 0.422 +/- 0.178. P value is [32m0.00884269257131[0m
+[34mMLP[0m:
+[36mG-Mean[0m 0.9568 +/- 0.0023, [36mF-Score[0m 0.8860 +/- 0.0039, [36mRecall[0m 0.9297 +/- 0.0051, [36mPrecision[0m 0.8462 +/- 0.0100, [36mSpecificity[0m 0.9846 +/- 0.0010, [36mFPR[0m 0.0141 +/- 0.0009, [36mAccuracy[0m 0.9801 +/- 0.0005, 
+Accuracy (recall) on labelled MSPs only: 0.491 +/- 0.123. P value is [32m0.00136433290452[0m
+[34mNaive_Bayes[0m:
+[36mG-Mean[0m 0.8031 +/- 0.0111, [36mF-Score[0m 0.7390 +/- 0.0119, [36mRecall[0m 0.6554 +/- 0.0187, [36mPrecision[0m 0.8481 +/- 0.0248, [36mSpecificity[0m 0.9842 +/- 0.0025, [36mFPR[0m 0.0139 +/- 0.0023, [36mAccuracy[0m 0.9451 +/- 0.0032, 
+Accuracy (recall) on labelled MSPs only: 0.385 +/- 0.0743. P value is [32m0.00250069206813[0m
+[34mSVM[0m:
+[36mG-Mean[0m 0.9074 +/- 0.0075, [36mF-Score[0m 0.8689 +/- 0.0166, [36mRecall[0m 0.8310 +/- 0.0134, [36mPrecision[0m 0.9109 +/- 0.0319, [36mSpecificity[0m 0.9909 +/- 0.0032, [36mFPR[0m 0.0082 +/- 0.0029, [36mAccuracy[0m 0.9749 +/- 0.0029, 
+Accuracy (recall) on labelled MSPs only: 0.626 +/- 0.144. P value is [32m0.0387749760009[0m
+[34mRandom_Forest[0m:
+[36mG-Mean[0m 0.9575 +/- 0.0059, [36mF-Score[0m 0.8786 +/- 0.0084, [36mRecall[0m 0.9325 +/- 0.0126, [36mPrecision[0m 0.8310 +/- 0.0188, [36mSpecificity[0m 0.9832 +/- 0.0018, [36mFPR[0m 0.0155 +/- 0.0017, [36mAccuracy[0m 0.9790 +/- 0.0013, 
+Accuracy (recall) on labelled MSPs only: 0.429 +/- 0.175. P value is [32m0.00315601394393[0m
+[34mAdaBoost[0m:
+[36mG-Mean[0m 0.9559 +/- 0.0047, [36mF-Score[0m 0.8711 +/- 0.0098, [36mRecall[0m 0.9304 +/- 0.0113, [36mPrecision[0m 0.8194 +/- 0.0255, [36mSpecificity[0m 0.9820 +/- 0.0025, [36mFPR[0m 0.0165 +/- 0.0023, [36mAccuracy[0m 0.9778 +/- 0.0013, 
+Accuracy (recall) on labelled MSPs only: 0.422 +/- 0.0686. P value is [32m6.92726583147e-05[0m

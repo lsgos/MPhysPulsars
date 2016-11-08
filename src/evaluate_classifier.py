@@ -6,9 +6,19 @@ and saving fully trained classifiers to disk using joblib.
 from __future__ import division
 from __future__ import print_function
 
+try:
+    import termcolor
+    TERMCOLOR = True
+except ImportError as e:
+    TERMCOLOR = False
+
+
 import argparse
 import os
 import ast
+import numpy as np
+
+from scipy.stats import ttest_rel
 
 from JACS_utils.ARFF import ARFF
 from JACS_utils.ClassifierStats import ClassifierStats
@@ -34,8 +44,10 @@ from sklearn.ensemble import AdaBoostClassifier
 
 def print_metrics(metrics):
     metric_labels = ["G-Mean","F-Score","Recall","Precision","Specificity","FPR","Accuracy"]
-    for l,m in zip(metric_labels, metrics):
-        print("{} {}, ".format(l,m), end = '')
+    if TERMCOLOR:
+        metric_labels = map(lambda s: termcolor.colored(s,'cyan'), metric_labels)
+    for l,(m, stdev) in zip(metric_labels, metrics):
+        print("{} {:.4f} +/- {:.4f}, ".format(l,m, stdev), end = '')
     print("")
 
 def get_metrics(C, datalen):
@@ -52,31 +64,58 @@ def get_metrics(C, datalen):
     metrics.append(C.getFP() / datalen) #fpr
     metrics.append(C.getAccuracy())
     return metrics
+def mean_calc(l):
+    #calculate the mean and standard deviation of a list
+    n = len(l)
+    mean = sum(l) / n
+    stdev = np.sqrt( 1 / (n - 1) * sum([(x - mean)**2 for x in l]))
+    return (mean,stdev)
 
-def calculate_metrics_k_fold(classifier, k_folds, x, y, parallel_workers,shuffle = True):
+def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_workers,shuffle = True):
 
     skf = StratifiedKFold(n_splits = k_folds, shuffle = shuffle)
     #farm jobs out to the parallel workers
-    metrics = parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,split) for split in skf.split(x,y))
-    #average over the runs and return results
-    return map(lambda x: sum(x) / len(x), zip(*metrics))
+    metrics,msp_recalls = zip (* (parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,msp_label,split) for split in skf.split(x,y)) ) )
 
-def _calculate_metrics(classifier,x,y, split_tup):
+    #average over the runs and return results
+    metlist = zip(* metrics)
+    msp_recall_list = zip(* msp_recalls)[0]
+
+    if args.show_msp_results:
+        recalls = metlist[2] #get just the recalls to compare
+        t_stat, p_val = ttest_rel(recalls,msp_recall_list)
+        return (map(mean_calc, metlist), mean_calc(msp_recall_list),(t_stat,p_val))
+
+    return (map(mean_calc, zip(*metrics)), None,None)
+
+def _calculate_metrics(classifier,x,y,msp_label, split_tup):
     train_index, test_index = split_tup
 
     clf = clone(classifier) #make sure they are not modified outside the loop
 
     x_train, x_test = x[train_index], x[test_index]
     y_train, y_test = y[train_index], y[test_index]
+    msp_label_train, msp_label_test = msp_label[train_index], msp_label[test_index]
 
     clf.fit(x_train, y_train)
     #calculate cross validation metrics
-    return fit_metrics(clf,x_test,y_test)
+    metrics =  fit_metrics(clf,x_test,y_test)
+    #split of msps if this flag is set
+    #GLOBAL
+    if args.show_msp_results:
+        msp_x_test = x_test[np.where(msp_label_test)]  #should there be a test in case this is of zero length?
+        msp_y_test = y_test[np.where(msp_label_test)]
+
+        msp_metrics = [clf.score(msp_x_test, msp_y_test)] #only the accuracy is really meaningful here
+
+        return (metrics,msp_metrics)
+    return (metrics,None)
 
 def fit_metrics(classifier, x_test, y_test):
     #calculate statistics for a trained classifier on a test set
     y_pred = classifier.predict(x_test)
     cm = confusion_matrix(y_test, y_pred)
+    #ipdb.set_trace()
     stats = ClassifierStats(cm)
     stats.calculate()
     metrics = get_metrics(stats, len(y_test))
@@ -107,10 +146,16 @@ if __name__ == "__main__":
         help = "Save trained classifiers to disk using joblib in \
                     this path location if provided")
     parser.add_argument("--k_folds","-k",
-        default = 5, help = "Number of folds to use for cross validation (default 5)")
+        default = 5,type = int, help = "Number of folds to use for cross validation (default 5)")
     parser.add_argument("--n_jobs","-j",
         default = 4, help = "Number of cores to utilize (recommended: ($nproc), default 4)",type = int)
+    parser.add_argument("--show_msp_results","-s",type = bool, default = False,
+                        help = "Whether to show seperate cross-validation metrics for msp's based on comment tags (***MSP***) in the arff file")
+    parser.add_argument("--termcolor", help = "If the termcolor library is present, print with pretty colors. default true", type = bool, default = True)
+
     args = parser.parse_args()
+
+    TERMCOLOR = TERMCOLOR and args.termcolor
 
     try:
         selected_features = ast.literal_eval(args.select_features)
@@ -126,9 +171,15 @@ if __name__ == "__main__":
 
     arff_reader = ARFF()
     try:
-        train_x, train_y = arff_reader.read(args.train)
+        train_x, train_y, train_labelled_msp = arff_reader.read(args.train)
+        if args.show_msp_results:
+            assert(len(train_labelled_msp[train_labelled_msp == True]) > 0)
+
     except IOError as e:
         print("Cannot open training data file: does it exist?")
+        quit()
+    except AssertionError as e:
+        print("Cannot provide seperate MSP validation if no data points are labelled as msp's. Msp's should be labelled with a %***MSP*** comment in the arff file")
         quit()
     #select features
     train_x = train_x[:,selected_features]
@@ -145,12 +196,26 @@ if __name__ == "__main__":
 
     #cross validation is embarrassingly parallel: parallelize the calculation for speed, re-using the worker pool.
     with joblib.Parallel(n_jobs = args.n_jobs) as parallel_workers:
-        metrics = [(name,calculate_metrics_k_fold(clf, args.k_folds, train_x, train_y, parallel_workers) ) for name, clf in classifiers]
+        metrics = [(name,calculate_metrics_k_fold(clf, args.k_folds, train_x, train_y, train_labelled_msp,  parallel_workers) ) for name, clf in classifiers]
     #print metrics
     print("\t----------CROSS VALIDATION RESULTS--------------")
-    for name, metric in metrics:
+    for name, (metric, msp_metric, t_stats) in metrics:
+        if TERMCOLOR:
+            name = termcolor.colored(name,'blue')
         print("{}:".format(name))
         print_metrics(metric)
+        if msp_metric is not None:
+            m,stdev = msp_metric
+            t_stat,p = t_stats
+            if TERMCOLOR:
+                if p < 0.05:
+                    strp = termcolor.colored(str(p),'green')
+                else:
+                    strp = termcolor.colored(str(p),'red')
+            else:
+                strp = str(p)
+            strp.format()
+            print("Accuracy (recall) on labelled MSPs only: {:.3} +/- {:.3}. P value is {}".format(m,stdev,strp))
 
     if args.save_classifiers is not None or args.test is not None:
         #fit the classifiers on the whole training set
