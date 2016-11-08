@@ -285,6 +285,7 @@ class PHCXFeatureExtractor(FeatureExtractor):
         
         """
         
+        section=0
         # Extract data.
         dec_value = []
         block = xmldata.getElementsByTagName('DataBlock') # gets all of the bits with the title 'section'.
