@@ -11,11 +11,13 @@ import numpy as np
 import re
 import os
 import sys
-
+from JACS_utils.ARFF import ARFF
 import ipdb
 
+csv_name = re.compile(".*\.csv")
+arff_name = re.compile(".*\.arff")
 
-INSTALLPATH = os.path.join('/','home','lewis','MPhysProject-s1','src')
+INSTALLPATH = os.path.join('/','home','lewis','MPhysPulsars','src')
 
 class CSV:
     def read(self,path):
@@ -34,7 +36,7 @@ class CSV:
                 label    = [int(x)   for x in components[len(components)-1:len(components)]]
                 X.append(features)
                 Y.append(label)
-        # Call to ravel below converts label column vector into 1D array.            
+        # Call to ravel below converts label column vector into 1D array.
         return np.array(X),np.ravel(np.array(Y),order='C')
 
 def read_label_file(filename):
@@ -73,7 +75,7 @@ class MICalc:
         _,attr = self.X.shape
         for i in range(attr):
             mini = np.amin(self.X[:,i])
-            maxi = np.amax(self.X[:,i]) 
+            maxi = np.amax(self.X[:,i])
             bins = np.linspace(mini,maxi,n_bins+1)
             bins[-1] +=1
             #digitize sorts by a <= x < b, so this ensures the max is actually binned
@@ -242,7 +244,7 @@ class MICalc:
         if labels is not None and attr != len(labels):
             print "error: number of labels suppiled not equal to number of attributes"
             sys.exit(0)
-	
+
 	#sort MI back to feature order
 	self.MI.sort(key = lambda tup: tup[0])
         with open(filename,'w') as f:
@@ -259,10 +261,8 @@ class MICalc:
 
 #----------begin main--------------#
 
-allowed_filenames = re.compile(".*\.csv")
-
 parser = argparse.ArgumentParser(description = 'Find the mutual information of features in a dataset')
-parser.add_argument("filename", help = "The file containing the dataset. Must be in CSV format")
+parser.add_argument("filename", help = "The file containing the dataset. Must be in CSV or ARFF format")
 parser.add_argument("-b","--bins", type = int, help = "The number of bins to use when discretizing the features (default = 10). If the data has been discretized already, then setting this option to 0 will disable the binning.")
 parser.add_argument("-q","--quiet", action = "store_true", help = "Whether to print the output to command line as a table")
 parser.add_argument("-d", "--dest", help = "Filename of a destination file")
@@ -276,17 +276,22 @@ if args.labels is not None:
         args.labels = os.path.join(INSTALLPATH,'resources','thorntonlabels.csv')
     elif args.labels == 'Combined':
         args.labels = os.path.join(INSTALLPATH,'resources','combinedlabels.csv')
+    elif args.labels == 'Period+Lyon':
+        args.labels = os.path.join(INSTALLPATH,'resources','period+lyonlabels.csv')
 
     labels = read_label_file(args.labels)
 else:
     labels = None
 
-if allowed_filenames.match(args.filename) is None:
-    print "Target file must be in .csv format"
-    sys.exit(0)
-
-csv = CSV()
-x,y = csv.read(args.filename)
+if csv_name.match(args.filename) is not None:
+    csv = CSV()
+    x,y = csv.read(args.filename)
+elif arff_name.match(args.filename) is not None:
+    arff = ARFF()
+    x,y = arff.read(args.filename)
+else:
+    print "File must be in either arff or csv format"
+    quit()
 m = MICalc(x,y,n_bins = args.bins)
 if not args.quiet:
     m.printMutualInfo(labels)
@@ -294,4 +299,3 @@ if args.dest is not None:
     if allowed_filenames.match(args.dest) is None:
         args.dest = args.dest + '.csv'
     m.writeToFile(args.dest)
-

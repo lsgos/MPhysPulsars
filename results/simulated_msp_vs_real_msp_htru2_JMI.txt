@@ -1,0 +1,11 @@
+]0;IPython: lewis/MPhysPulsarsFeature                           | Mutual Information | JMI Rank
+__________________________________________________________________
+DM. mean                          | 0.756366           |  1
+DM. kurt                          | 0.658799           |  3
+prof.stddev                       | 0.628137           |  2
+DM. stdev                         | 0.608387           |  5
+period                            | 0.413736           |  6
+DM skew                           | 0.256003           |  7
+prof. skew                        | 0.123677           |  9
+prof.kurt                         | 0.101313           |  8
+prof. mean                        | 0.074348           |  4

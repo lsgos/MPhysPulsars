@@ -30,10 +30,11 @@ def make_arff_name(name):
     return name
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-    description = "Split an arff file by period (assumed to be the first data field) a file target containing all datapoints that pass the condition and another, rest, containing the remaining data")
-    parser.add_argument("--target","-t", help = "arff file containing all datapoints that passed the condition", default = "target.arff")
-    parser.add_argument("--rest","-r", help = "arff file containing all datapoints that failed the condition", default = "rest.arff")
-    parser.add_argument("--splitthresh","-s", help = "Value to split pulsars by", type = float)
+    description = "Split an arff file by period (assumed to be the first data field) a file, msp, containing all datapoints that pass both conditions, another, pulsar, that fails the period condition but passes the pulsar condition and another, noise, containing the remaining data")
+    parser.add_argument("--msp","-t", help = "arff file containing all datapoints that passed the msp and general pulsar conditions", default = "msp.arff")
+    parser.add_argument("--pulsar","-u", help = "arff file containing all datapoints that failed the msp condition but passed the pulsar condition", default = "pulsar.arff")
+    parser.add_argument("--noise","-r", help = "arff file containing all datapoints that failed both conditions", default = "noise.arff")
+    parser.add_argument("--splitthresh","-s", help = "Value to split pulsars by", type = float, default = 31.0)
     parser.add_argument("--periodfield","-p", help = "Period field (default 1)")
     parser.add_argument("file", help = "the file to process (must be in arff format)")
 
@@ -44,8 +45,9 @@ if __name__ == "__main__":
 
     with open(args.file) as f:
         header = parse_arff_header(f)
-        target_lines = []
-        rest_lines = []
+        msp_lines = []
+        pulsar_lines = []
+        noise_lines = []
         for line in f:
             if line.strip() == "":
                 continue
@@ -53,22 +55,31 @@ if __name__ == "__main__":
             #assume period is the first field, and class the last
             period = float(fields[0])
             category = int(fields[-1])
+            # split off MSPs
             if category == 1 and period < args.splitthresh:
-                target_lines.append(line)
+                msp_lines.append(line)
+            elif category == 1 and period >= args.splitthresh:
+                pulsar_lines.append(line)
             else:
-                rest_lines.append(line)
+                noise_lines.append(line)
 
     #write target files
-    args.target = make_arff_name(args.target)
-    args.rest = make_arff_name(args.rest)
+    args.msp = make_arff_name(args.msp)
+    args.pulsar = make_arff_name(args.pulsar)
+    args.noise = make_arff_name(args.noise)
 
-    with open(args.target,'w') as f:
+    with open(args.msp,'w') as f:
         for h in header:
             f.write(h)
-        for t in target_lines:
+        for t in msp_lines:
             f.write(t)
-    with open(args.rest,'w') as f:
+    with open(args.pulsar,'w') as f:
         for h in header:
             f.write(h)
-        for t in rest_lines:
+        for t in pulsar_lines:
+            f.write(t)
+    with open(args.noise,'w') as f:
+        for h in header:
+            f.write(h)
+        for t in noise_lines:
             f.write(t)
