@@ -19,8 +19,8 @@ if __name__ == "__main__":
     parser.add_argument("--fil","-f", help = "input .fil file ")
     parser.add_argument("--snrlo", help = "Desired signal to noise ratio of generated signals",type = float)
     parser.add_argument("--snrhi", help = "Desired signal to noise ratio of generated signals",type = float)
-    parser.add_argument("--flo", help = "Desired frequency range",type = float)
-    parser.add_argument("--fhi", help = "Desired frequency range",type = float)
+    parser.add_argument("--plo", help = "Desired period range",type = float)
+    parser.add_argument("--phi", help = "Desired period range",type = float)
     parser.add_argument("--dmlo", help = "Desired dispersion measure range", type = float)
     parser.add_argument("--dmhi", help = "Desired dispersion measure range", type = float)
     parser.add_argument("--par","-par", help = "Filename to save the par as", default = "fake.par")
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     profile_gen.dump_profile(args.prof) #creates a profile file
-    DM,_ = par_gen.make_par(args.par,args.dmlo,args.dmhi,args.flo,args.fhi) #CHANGE
+    DM,_ = par_gen.make_par(args.par,args.dmlo,args.dmhi,args.plo,args.phi) 
     SNR = random.random() * (args.snrhi - args.snrlo) + args.snrlo
     #get MJD
 

@@ -6,10 +6,13 @@ Author: Alex Lisboa-Wright
 """
 
 #parameter random number generator
+from __future__ import division
 from numpy import random
 
-def make_par(filename,dmlow,dmhigh,f0low,f0high):
-    f0 = random.random() *(f0high - f0low) + f0low
+def make_par(filename,dmlow,dmhigh,plow,phigh):
+
+    p = random.random() *(phigh - plow) + plow #generate a uniform distribution in period, then convert to frequency
+    f0 = (1.0/p)
     dm = random.random() *(dmhigh - dmlow) + dmlow
     with open(filename,'w') as f:
         f.write("PSR J0000-0000 \nRAJ 00:00:00 \nDECJ 00:00:00 \nPEPOCH 55000 \n")
