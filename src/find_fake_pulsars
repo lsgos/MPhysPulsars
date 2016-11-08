@@ -11,7 +11,12 @@ import argparse
 import re
 
 # tolerance on parameters
-p_tol = 0.5
+def get_p_tol(p):
+    #return the period tolerance, calculated from the doppler shift due to the earth's motion
+    return 9.92e-02*(1.0 /p)  + 0.1
+
+
+
 dm_tol = 0.5
 
 fil_re= re.compile('.*fil\.lis')
@@ -69,6 +74,7 @@ def process_directory(dir_name):
             candnames = []
             for line in f:
                 fname,snr,period,dm = parse_lis_line(line)
+                p_tol = get_p_tol(period)
                 if (target_dm - dm_tol) < dm < (target_dm + dm_tol) and (target_p - p_tol) < period < (target_p + p_tol):
                     loss = score_cand(target_p,target_dm,period,dm)
                     candnames.append((fname,loss))
