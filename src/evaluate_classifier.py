@@ -95,6 +95,7 @@ def _calculate_metrics(classifier,x,y,msp_label, split_tup,args):
 
     train_index, test_index = split_tup
 
+
     clf = clone(classifier) #make sure they are not modified outside the loop
 
     x_train, x_test = x[train_index], x[test_index]
@@ -125,6 +126,7 @@ def score_test_k_fold(classifier,k_folds, train_x,train_y,test_x,test_y,parallel
     scores = parallel_workers(
         joblib.delayed(_score_test)(classifier,train_x,train_y,test_x,test_y,split) \
         for split in skf.split(train_x,train_y ))
+    print (scores)
     return mean_calc(scores)
 
 
