@@ -1,7 +1,9 @@
 """
 Evalute the performance of several classifiers on a dataset in .arff format,
 evaluating classification metrics using stratified k-fold cross validation,
-and saving fully trained classifiers to disk using joblib.
+and saving fully trained classifiers to disk using joblib if desired.
+
+This code represents our data analysis, and should be usable to reproduce any results we obtain
 """
 from __future__ import division
 from __future__ import print_function
@@ -77,16 +79,16 @@ def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_work
     #farm jobs out to the parallel workers
     metrics,msp_recalls = zip (* (parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,msp_label,split) for split in skf.split(x,y)) ) )
 
-    #average over the runs and return results
     metlist = zip(* metrics)
-    msp_recall_list = zip(* msp_recalls)[0]
+
 
     if args.show_msp_results:
+        msp_recall_list = zip(*msp_recalls)[0]
         recalls = metlist[2] #get just the recalls to compare
         t_stat, p_val = ttest_rel(recalls,msp_recall_list)
         return (map(mean_calc, metlist), mean_calc(msp_recall_list),(t_stat,p_val))
 
-    return (map(mean_calc, zip(*metrics)), None,None)
+    return (map(mean_calc, metlist), None,None)
 
 def _calculate_metrics(classifier,x,y,msp_label, split_tup):
     train_index, test_index = split_tup
@@ -95,7 +97,7 @@ def _calculate_metrics(classifier,x,y,msp_label, split_tup):
 
     x_train, x_test = x[train_index], x[test_index]
     y_train, y_test = y[train_index], y[test_index]
-    msp_label_train, msp_label_test = msp_label[train_index], msp_label[test_index]
+    msp_label_test = msp_label[test_index]
 
     clf.fit(x_train, y_train)
     #calculate cross validation metrics
@@ -109,7 +111,7 @@ def _calculate_metrics(classifier,x,y,msp_label, split_tup):
         msp_metrics = [clf.score(msp_x_test, msp_y_test)] #only the accuracy is really meaningful here
 
         return (metrics,msp_metrics)
-    return (metrics,None)
+    return (metrics,[None])
 
 def fit_metrics(classifier, x_test, y_test):
     #calculate statistics for a trained classifier on a test set
@@ -229,7 +231,7 @@ if __name__ == "__main__":
             joblib.dump(clf, os.path.join(args.save_classifiers,(name+".pkl")))
     if args.test is not None:
         try:
-            test_x, test_y = arff_reader.read(args.test)
+            test_x, test_y,_ = arff_reader.read(args.test)
             test_x = test_x[:,selected_features]
 
         except IOError as e:
@@ -237,4 +239,6 @@ if __name__ == "__main__":
         test_metrics = [(name, clf.score(test_x,test_y)) for name,clf in classifiers]
         print("\t----------TEST SET RESULTS (Accuracy)--------------")
         for name,metric in test_metrics:
+            if TERMCOLOR:
+                name = termcolor.colored(name,'cyan')
             print("{}: {}".format(name, metric))
