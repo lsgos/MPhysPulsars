@@ -41,7 +41,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 
-
+args = None
 
 
 def print_metrics(metrics):
@@ -73,11 +73,11 @@ def mean_calc(l):
     stdev = np.sqrt( 1 / (n - 1) * sum([(x - mean)**2 for x in l]))
     return (mean,stdev)
 
-def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_workers,shuffle = True):
+def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_workers, args,shuffle = True):
 
     skf = StratifiedKFold(n_splits = k_folds, shuffle = shuffle)
     #farm jobs out to the parallel workers
-    metrics,msp_recalls = zip (* (parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,msp_label,split) for split in skf.split(x,y)) ) )
+    metrics,msp_recalls = zip (* (parallel_workers(joblib.delayed(_calculate_metrics)(classifier,x,y,msp_label,split,args) for split in skf.split(x,y)) ) )
 
     metlist = zip(* metrics)
 
@@ -90,7 +90,8 @@ def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_work
 
     return (map(mean_calc, metlist), None,None)
 
-def _calculate_metrics(classifier,x,y,msp_label, split_tup):
+def _calculate_metrics(classifier,x,y,msp_label, split_tup,args):
+    
     train_index, test_index = split_tup
 
     clf = clone(classifier) #make sure they are not modified outside the loop
@@ -156,7 +157,7 @@ if __name__ == "__main__":
     parser.add_argument("--termcolor", help = "If the termcolor library is present, print with pretty colors. default true", type = bool, default = True)
 
     args = parser.parse_args()
-
+    
     TERMCOLOR = TERMCOLOR and args.termcolor
 
     try:
@@ -198,7 +199,7 @@ if __name__ == "__main__":
 
     #cross validation is embarrassingly parallel: parallelize the calculation for speed, re-using the worker pool.
     with joblib.Parallel(n_jobs = args.n_jobs) as parallel_workers:
-        metrics = [(name,calculate_metrics_k_fold(clf, args.k_folds, train_x, train_y, train_labelled_msp,  parallel_workers) ) for name, clf in classifiers]
+        metrics = [(name,calculate_metrics_k_fold(clf, args.k_folds, train_x, train_y, train_labelled_msp,  parallel_workers, args) ) for name, clf in classifiers]
     #print metrics
     print("\t----------CROSS VALIDATION RESULTS--------------")
     for name, (metric, msp_metric, t_stats) in metrics:
