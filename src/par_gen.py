@@ -22,8 +22,8 @@ def make_par(filename,dmlow,dmhigh,plow,phigh):
 
 if __name__ == "__main__":
     filename="test.txt"
-    f0low = float(raw_input("Lower pulsar frequency limit: "))
-    f0high = float(raw_input("Upper pulsar frequency limit: "))
+    plow = float(raw_input("Lower pulsar frequency limit: "))
+    phigh = float(raw_input("Upper pulsar frequency limit: "))
     dmlow = float(raw_input("Lower DM limit: "))
     dmhigh = float(raw_input("Upper DM limit: "))
-    make_par(filename,dmlow,dmhigh,f0low,f0high)
+    make_par(filename,dmlow,dmhigh,plow,phigh)

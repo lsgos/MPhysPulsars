@@ -85,13 +85,14 @@ def calculate_metrics_k_fold(classifier, k_folds, x, y, msp_label, parallel_work
     if args.show_msp_results:
         msp_recall_list = zip(*msp_recalls)[0]
         recalls = metlist[2] #get just the recalls to compare
+        msp_recall_list,recalls = zip(*[(m,r) for m,r in zip(msp_recall_list,recalls) if r is not None])
         t_stat, p_val = ttest_rel(recalls,msp_recall_list)
         return (map(mean_calc, metlist), mean_calc(msp_recall_list),(t_stat,p_val))
 
     return (map(mean_calc, metlist), None,None)
 
 def _calculate_metrics(classifier,x,y,msp_label, split_tup,args):
-    
+
     train_index, test_index = split_tup
 
     clf = clone(classifier) #make sure they are not modified outside the loop
@@ -104,15 +105,38 @@ def _calculate_metrics(classifier,x,y,msp_label, split_tup,args):
     #calculate cross validation metrics
     metrics =  fit_metrics(clf,x_test,y_test)
     #split of msps if this flag is set
-    #GLOBAL
+
     if args.show_msp_results:
         msp_x_test = x_test[np.where(msp_label_test)]  #should there be a test in case this is of zero length?
         msp_y_test = y_test[np.where(msp_label_test)]
-
+        if len(msp_x_test) == 0:
+            #No msp's in this fold: could happen
+            return (metrics,[None])
         msp_metrics = [clf.score(msp_x_test, msp_y_test)] #only the accuracy is really meaningful here
 
         return (metrics,msp_metrics)
     return (metrics,[None])
+
+def score_test_k_fold(classifier,k_folds, train_x,train_y,test_x,test_y,parallel_workers):
+    #score the test set by training stratified folds of the test set to get an
+    #estimate of the mean and standard deviation for significance tests.
+    skf = StratifiedKFold(n_splits = k_folds, shuffle = True)
+
+    scores = parallel_workers(
+        joblib.delayed(_score_test)(classifier,train_x,train_y,test_x,test_y,split) \
+        for split in skf.split(train_x,train_y ))
+    return mean_calc(scores)
+
+
+def _score_test(classifier,x,y,test_x,test_y, split_tup):
+    train_index,_ = split_tup
+    clf = clone(classifier)
+    x_train,y_train = x[train_index], y[train_index]
+
+    clf.fit(x_train,y_train)
+    score = clf.score(test_x,test_y)
+
+    return score
 
 def fit_metrics(classifier, x_test, y_test):
     #calculate statistics for a trained classifier on a test set
@@ -153,11 +177,13 @@ if __name__ == "__main__":
     parser.add_argument("--n_jobs","-j",
         default = 4, help = "Number of cores to utilize (recommended: ($nproc), default 4)",type = int)
     parser.add_argument("--show_msp_results","-s",type = bool, default = False,
-                        help = "Whether to show seperate cross-validation metrics for msp's based on comment tags (***MSP***) in the arff file")
-    parser.add_argument("--termcolor", help = "If the termcolor library is present, print with pretty colors. default true", type = bool, default = True)
+                        help = "Whether to show seperate cross-validation metrics \
+                        for msp's based on comment tags (***MSP***) in the arff file")
+    parser.add_argument("--termcolor", help = "If the termcolor library is present, \
+                        print with pretty colors. default true", type = bool, default = True)
 
     args = parser.parse_args()
-    
+
     TERMCOLOR = TERMCOLOR and args.termcolor
 
     try:
@@ -220,16 +246,15 @@ if __name__ == "__main__":
             strp.format()
             print("Accuracy (recall) on labelled MSPs only: {:.3} +/- {:.3}. P value is {}".format(m,stdev,strp))
 
-    if args.save_classifiers is not None or args.test is not None:
-        #fit the classifiers on the whole training set
+
+    if args.save_classifiers is not None:
         for name,clf in classifiers:
             #fit on the whole training set and save the classifier
             clf.fit(train_x,train_y)
-
-    if args.save_classifiers is not None:
         if not os.path.exists(args.save_classifiers):
             raise IOError("Cannot find path specified to save classifiers to")
             joblib.dump(clf, os.path.join(args.save_classifiers,(name+".pkl")))
+
     if args.test is not None:
         try:
             test_x, test_y,_ = arff_reader.read(args.test)
@@ -237,9 +262,12 @@ if __name__ == "__main__":
 
         except IOError as e:
             print("Cannot open training file: does it exist?")
-        test_metrics = [(name, clf.score(test_x,test_y)) for name,clf in classifiers]
+            quit()
+        with joblib.Parallel(n_jobs = args.n_jobs) as parallel_workers:
+            test_metrics = [(name, score_test_k_fold(clf,args.k_folds,train_x,train_y,test_x,test_y,parallel_workers)) for name,clf in classifiers]
         print("\t----------TEST SET RESULTS (Accuracy)--------------")
         for name,metric in test_metrics:
             if TERMCOLOR:
                 name = termcolor.colored(name,'cyan')
-            print("{}: {}".format(name, metric))
+            mean,stdev = metric
+            print("{}: {} +/- {}".format(name, mean,stdev))
