@@ -14,12 +14,12 @@ import re
 def get_p_tol(p):
     #return the period tolerance, calculated from the doppler shift due to the earth's motion
     delta_f = 9.93e-02*(1.0 /p)
-    delta_p = delta_f*((p^2)/1000) + 0.1
+    delta_p = delta_f*((p**2)/1000) + 0.2
     return delta_p
 
 
 
-dm_tol = 0.5
+dm_tol = 0.7
 
 fil_re= re.compile('.*\.lis')
 par_re= re.compile('.*fake\.par')
@@ -35,8 +35,8 @@ def parse_par_file(f):
         att, val = l.split(' ')
         if att == 'DM':
             dm = float(val)
-        elif att == 'F0':
-            period = 1000.0 / float(val)
+        elif att == 'P0':
+            period = 1000*float(val)
         else:
             continue
 
