@@ -14,7 +14,11 @@ import re
 def get_p_tol(p):
     #return the period tolerance, calculated from the doppler shift due to the earth's motion
     delta_f = 9.93e-02*(1.0 /p)
+<<<<<<< HEAD
     delta_p = delta_f*((p**2)/1000) + 0.2
+=======
+    delta_p = delta_f*((p**2)/1000) + 0.1
+>>>>>>> cea6b228409969df63100f36783ca10329a9c2bc
     return delta_p
 
 
@@ -43,6 +47,14 @@ def parse_par_file(f):
     if period is None or dm is None:
         raise RuntimeError('Unable to parse .par file, may be missing attributes')
     return period,dm
+
+def test_half_p(p, target_p):
+    """checks period to see if it is the real period or a half-period due to lower-amplitude peaks at half-phase point in profile"""
+    if p <= target_p/2:
+        p = 2*p
+        return p
+    else:
+        return p
 
 def parse_lis_line(l):
     """takes the string line from the .lis file and extracts the relevant info"""
@@ -76,6 +88,7 @@ def process_directory(dir_name):
             candnames = []
             for line in f:
                 fname,snr,period,dm = parse_lis_line(line)
+                period = test_half_p(period, target_p)
                 p_tol = get_p_tol(period)
                 if (target_dm - dm_tol) < dm < (target_dm + dm_tol) and (target_p - p_tol) < period < (target_p + p_tol):
                     loss = score_cand(target_p,target_dm,period,dm)
