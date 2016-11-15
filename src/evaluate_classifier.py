@@ -126,7 +126,6 @@ def score_test_k_fold(classifier,k_folds, train_x,train_y,test_x,test_y,parallel
     scores = parallel_workers(
         joblib.delayed(_score_test)(classifier,train_x,train_y,test_x,test_y,split) \
         for split in skf.split(train_x,train_y ))
-    print (scores)
     return mean_calc(scores)
 
 

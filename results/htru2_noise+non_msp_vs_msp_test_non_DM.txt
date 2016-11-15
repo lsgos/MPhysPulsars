@@ -1,0 +1,20 @@
+	----------CROSS VALIDATION RESULTS--------------
+CART_tree:
+G-Mean 0.8866 +/- 0.0095, F-Score 0.8036 +/- 0.0141, Recall 0.8010 +/- 0.0173, Precision 0.8068 +/- 0.0264, Specificity 0.9814 +/- 0.0025, FPR 0.0170 +/- 0.0023, Accuracy 0.9653 +/- 0.0024, 
+MLP:
+G-Mean 0.9592 +/- 0.0083, F-Score 0.8849 +/- 0.0105, Recall 0.9343 +/- 0.0159, Precision 0.8406 +/- 0.0121, Specificity 0.9848 +/- 0.0011, FPR 0.0140 +/- 0.0011, Accuracy 0.9808 +/- 0.0018, 
+Naive_Bayes:
+G-Mean 0.8840 +/- 0.0040, F-Score 0.8079 +/- 0.0094, Recall 0.7951 +/- 0.0073, Precision 0.8214 +/- 0.0194, Specificity 0.9827 +/- 0.0018, FPR 0.0157 +/- 0.0017, Accuracy 0.9657 +/- 0.0013, 
+SVM:
+G-Mean 0.9140 +/- 0.0147, F-Score 0.8678 +/- 0.0196, Recall 0.8443 +/- 0.0262, Precision 0.8929 +/- 0.0178, Specificity 0.9896 +/- 0.0017, FPR 0.0094 +/- 0.0016, Accuracy 0.9760 +/- 0.0038, 
+Random_Forest:
+G-Mean 0.9551 +/- 0.0117, F-Score 0.8759 +/- 0.0098, Recall 0.9274 +/- 0.0234, Precision 0.8304 +/- 0.0180, Specificity 0.9838 +/- 0.0017, FPR 0.0149 +/- 0.0016, Accuracy 0.9793 +/- 0.0017, 
+AdaBoost:
+G-Mean 0.9529 +/- 0.0096, F-Score 0.8765 +/- 0.0120, Recall 0.9227 +/- 0.0183, Precision 0.8348 +/- 0.0133, Specificity 0.9842 +/- 0.0012, FPR 0.0145 +/- 0.0012, Accuracy 0.9793 +/- 0.0020, 
+	----------TEST SET RESULTS (Accuracy)--------------
+CART_tree: 0.50985915493 +/- 0.028864650045
+MLP: 0.529577464789 +/- 0.0125975660704
+Naive_Bayes: 0.492957746479 +/- 6.20633538312e-17
+SVM: 0.718309859155 +/- 0.0
+Random_Forest: 0.521126760563 +/- 0.0172499277661
+AdaBoost: 0.50985915493 +/- 0.0183639504372
