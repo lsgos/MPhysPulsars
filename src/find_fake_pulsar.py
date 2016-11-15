@@ -13,7 +13,9 @@ import re
 # tolerance on parameters
 def get_p_tol(p):
     #return the period tolerance, calculated from the doppler shift due to the earth's motion
-    return 9.92e-02*(1.0 /p)  + 0.1
+    delta_f = 9.93e-02*(1.0 /p)
+    delta_p = delta_f*((p^2)/1000) + 0.1
+    return delta_p
 
 
 
@@ -90,7 +92,7 @@ def process_directory(dir_name):
 
     for n,_ in candnames:
         print os.path.join(dir_name,n) #print to stdout in decreasing order of likehood
-        
+
     return True
 
 def search_directories(dir_name):
