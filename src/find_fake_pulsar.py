@@ -21,7 +21,7 @@ def get_p_tol(p):
 
 dm_tol = 0.5
 
-fil_re= re.compile('.*fil\.lis')
+fil_re= re.compile('.*\.lis')
 par_re= re.compile('.*fake\.par')
 
 
