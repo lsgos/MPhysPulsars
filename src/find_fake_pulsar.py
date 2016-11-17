@@ -14,11 +14,8 @@ import re
 def get_p_tol(p):
     #return the period tolerance, calculated from the doppler shift due to the earth's motion
     delta_f = 9.93e-02*(1.0 /p)
-<<<<<<< HEAD
-    delta_p = delta_f*((p**2)/1000) + 0.2
-=======
     delta_p = delta_f*((p**2)/1000) + 0.1
->>>>>>> cea6b228409969df63100f36783ca10329a9c2bc
+
     return delta_p
 
 
