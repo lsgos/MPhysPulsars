@@ -94,20 +94,23 @@ def process_file(filename, pad_length, target_filename, noise_min, noise_max, no
 
 def process_directory(dirname,pad_length,target_dir,noise_min = 10, noise_max= 50, noise_rate = 0.09):
     assert os.path.exists(dirname)
-
+    assert os.path.exists(target_dir)
     ls = os.listdir(dirname)
     for f in ls:
         if os.path.isdir(f):
-            process_directory(os.path.join(dirname,f))
+            process_directory(os.path.join(dirname,f), pad_length, target_dir, noise_min, noise_max, noise_rate)
         elif ".phcx" in f:
             process_file(os.path.join(dirname,f),pad_length,os.path.join(target_dir,f ), noise_min, noise_max, noise_rate)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description = "Pads fake pulsar files with noise tails, writin copies of the phcx files to outdir.")
     parser.add_argument("dir", help = "directory to process. Will process all files phcx recursively")
+    parser.add_argument("outdir","-d", help = "directory to write modified files to")
     parser.add_argument("--pad_length", help = "length to pad dm out too", default = 1119, type = int)
-    parser.add_argument("--out_dir","-d", help = "directory to write modified files to")
+
+    parser.add_argument("--plot_f")
     args = parser.parse_args()
 
-    process_directory(args.dir,args.pad_length,args.out_dir)
+
+    process_directory(args.dir,args.pad_length,args.outdir)
