@@ -251,7 +251,7 @@ if __name__ == "__main__":
 
     try:
         selected_features = ast.literal_eval(args.select_features)
-        #test to see if the features are validation
+        #test to see if the features are valid
         if len( set(selected_features) - valid_features) > 0:
             raise ValueError
 
@@ -273,8 +273,6 @@ if __name__ == "__main__":
     except AssertionError as e:
         print("Cannot provide seperate MSP validation if no data points are labelled as msp's. Msp's should be labelled with a %***MSP*** comment in the arff file")
         quit()
-
-
 
     #select features
     train_x = train_x[:,selected_features]
