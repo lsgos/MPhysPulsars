@@ -125,6 +125,10 @@ class Evaluator:
         self.classifiers.append(("Random_Forest",RandomForestClassifier() ))
         self.classifiers.append(("AdaBoost", AdaBoostClassifier() ))
         self.metric_labels = ["G-Mean","F-Score","Recall","Precision","Specificity","FPR","Accuracy"]
+
+        self.metrics = None
+        self.test_metrics = None
+
         if self.termcolor:
             self.metric_labels = map(lambda s: termcolor.colored(s,'cyan'), self.metric_labels)
 
@@ -165,6 +169,16 @@ class Evaluator:
                 name = termcolor.colored(name,'cyan')
             mean,stdev = metric
             print("{}: {} +/- {}".format(name, mean,stdev))
+
+    def print_simple_output(self):
+        """
+        Print the output in a simplified format: just the recall for each classifier, then the recall on the labelled set
+        """
+        for name,(metrics,msp_metrics, t_stats) in self.metrics:
+            recall = metrics[2][0]
+            msp_recall,_ = msp_metrics
+            print(recall, msp_recall, end = " ")
+        print()
 
     def dump_classifiers(self, savepath):
         if not os.path.exists(savepath):
@@ -238,13 +252,13 @@ if __name__ == "__main__":
         default = 5,type = int, help = "Number of folds to use for cross validation (default 5)")
     parser.add_argument("--n_jobs","-j",
         default = 4, help = "Number of cores to utilize (recommended: ($nproc), default 4)",type = int)
-    parser.add_argument("--show_msp_results","-s",type = bool, default = False,
+    parser.add_argument("--show_msp_results","-s",action = "store_true",
                         help = "Whether to show seperate cross-validation metrics \
-                        for msp's based on comment tags (***MSP***) in the arff file")
+                        for msp's based on comment tags (***MSP***) in the arff file (default false)")
     parser.add_argument("--termcolor", help = "If the termcolor library is present, \
-                        print with pretty colors. default true", type = bool, default = True)
+                        print with pretty colors. default true", action = "store_false")
 
-    parser.add_argument("--simple_output", help = "If this flag is present, print results in an easily parsable, less human readable format", default = False)
+    parser.add_argument("--simple_output", help = "If this flag is present, print results in an easily parsable, less human readable format", action = "store_true")
     args = parser.parse_args()
 
     TERMCOLOR = TERMCOLOR and args.termcolor
@@ -297,3 +311,6 @@ if __name__ == "__main__":
         evaluator.pretty_print_cross_val()
         if args.test:
             evaluator.pretty_print_test_stats()
+    else:
+
+        evaluator.print_simple_output()

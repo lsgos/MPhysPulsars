@@ -4,7 +4,7 @@ Created on Thu Nov 03 11:30:34 2016
 
 @author: Alex Lisboa-Wright
 """
-
+from __future__ import print_function
 # code that changes the "class" label of a dataset
 import argparse
 import re
@@ -35,13 +35,13 @@ def make_arff_name(name):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--commarff","-c", help = "arff file containing all data from original input file with msps commented", default = "htru2_msp_commented.arff")
+    #parser.add_argument("--commarff","-c", help = "arff file containing all data from original input file with msps commented", default = "htru2_msp_commented.arff")
     parser.add_argument("--mspcomment","-n", help = "msp comment to be added", default = "%***MSP***")
-    parser.add_argument("--mspcutoffperiod","-p", help = "cutoff period between MSPs and non-MSP pulsars (in ms)", default = 31.0)
+    parser.add_argument("--mspcutoffperiod","-p", help = "cutoff period between MSPs and non-MSP pulsars (in ms)", default = 31.0, type = float)
     parser.add_argument("file", help = "the file to process (must be in arff format)")
-    
+
     args = parser.parse_args()
-    
+
     if arff_re.match(args.file) is None:
         raise IOError("Target file must be in arff format")
 
@@ -63,14 +63,14 @@ if __name__ == "__main__":
                 mspcomm_lines.append(line)
             else:
                 mspcomm_lines.append(line)
-           
+
     #write target file
-    args.commarff = make_arff_name(args.commarff)
-    
-    with open(args.commarff,'w') as f:
-        for h in header:
-            f.write(h)
-            
-        for t in mspcomm_lines:
-            f.write(t)
-        
+    #args.commarff = make_arff_name(args.commarff)
+
+    for l in header + mspcomm_lines:
+        print(l,end = "")
+#   with open(args.commarff,'w') as f:
+#       for h in header:
+#           f.write(h)
+#       for t in mspcomm_lines:
+#           f.write(t)
