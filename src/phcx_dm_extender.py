@@ -106,7 +106,7 @@ def process_directory(dirname,pad_length,target_dir,noise_min = 10, noise_max= 5
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Pads fake pulsar files with noise tails, writin copies of the phcx files to outdir.")
     parser.add_argument("dir", help = "directory to process. Will process all files phcx recursively")
-    parser.add_argument("outdir","-d", help = "directory to write modified files to")
+    parser.add_argument("outdir", help = "directory to write modified files to")
     parser.add_argument("--pad_length", help = "length to pad dm out too", default = 1119, type = int)
 
     parser.add_argument("--plot_f")
