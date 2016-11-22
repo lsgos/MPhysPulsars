@@ -12,7 +12,6 @@ import argparse
 
 import os
 
-import ipdb
 
 from matplotlib import pyplot as plt
 
@@ -44,7 +43,7 @@ if __name__ == "__main__":
 
     #iterate through the range of period cutoffs
 
-    cutoffs = [5 * i for i in range(1,20)]
+    cutoffs = [2 * i for i in range(1,100)]
 
 
     d = []
@@ -63,6 +62,6 @@ if __name__ == "__main__":
     datafields = zip(*d)
 
     plt.figure()
-    for dat in datafields:
-        plt.plot(cutoffs,dat)
+    for d in datafields:
+        plt.plot(cutoffs,datafields)
     plt.show()
