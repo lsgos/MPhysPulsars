@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     #iterate through the range of period cutoffs
 
-    cutoffs = [2 * i for i in range(1,100)]
+    cutoffs = [2 * i for i in range(10,100)]
 
 
     d = []
