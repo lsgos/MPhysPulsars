@@ -60,7 +60,7 @@ def encode_to_base16(dec):
 def noise_generator(l, noise_min, noise_max, noise_rate):
     #generates exponentially distributed fake noise tails for dm curves
     if np.floor(noise_rate) != 0:
-        raise ValueError("Noise rate must be in the interval [0,1)")
+        raise ValueError("Noise rate must be in the interval [0,1]")
 
     return [np.random.randint(noise_min,noise_max) if np.random.random() < noise_rate else 0 for i in xrange(l) ]
 
@@ -86,31 +86,56 @@ def process_file(filename, pad_length, target_filename, noise_min, noise_max, no
         filedata = open(filename,'r')
     xml = minidom.parse(filedata)
     dec = getDM_FFT(xml)
-    noise_dec = dec + noise_generator(args.pad_length - len(dec),10, 50, 0.09)
+    noise_dec = dec + noise_generator((args.pad_length - len(dec)), noise_min, noise_max, noise_rate)
 
     if not ".gz" in target_filename:
         target_filename = target_filename + ".gz"
     save_modified_phcx(xml,noise_dec, target_filename)
 
-def process_directory(dirname,pad_length,target_dir,noise_min = 10, noise_max= 50, noise_rate = 0.09):
+def process_directory(dirname,pad_length,target_dir,noise_min, noise_max, noise_rate, lowratelim, uppratelim):
     assert os.path.exists(dirname)
     assert os.path.exists(target_dir)
     ls = os.listdir(dirname)
     for f in ls:
+        noise_rate= lowratelim + np.random.random()*(abs(uppratelim-lowratelim))
         if os.path.isdir(f):
-            process_directory(os.path.join(dirname,f), pad_length, target_dir, noise_min, noise_max, noise_rate)
+            process_directory(os.path.join(dirname,f), pad_length, target_dir, noise_min, noise_max, noise_rate, lowratelim, uppratelim)
         elif ".phcx" in f:
             process_file(os.path.join(dirname,f),pad_length,os.path.join(target_dir,f ), noise_min, noise_max, noise_rate)
 
+def plot_dm(filename,padlength, noise_min, noise_max, noise_rate):
+
+    if ".gz" in filename:
+        filedata = gzip.open(filename)
+    else:
+        filedata = open(filename,'r')
+    xml = minidom.parse(filedata)
+    dec = getDM_FFT(xml)
+
+    plt.figure(1)
+    plt.plot(dec)
+
+    plt.figure(2)
+
+    noise_dec = dec + noise_generator((padlength - len(dec)),noise_min, noise_max, noise_rate)
+    plt.plot(noise_dec)
+
+    plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description = "Pads fake pulsar files with noise tails, writin copies of the phcx files to outdir.")
     parser.add_argument("dir", help = "directory to process. Will process all files phcx recursively")
     parser.add_argument("outdir", help = "directory to write modified files to")
-    parser.add_argument("--pad_length", help = "length to pad dm out too", default = 1119, type = int)
-
-    parser.add_argument("--plot_f")
+    parser.add_argument("--pad_length", help = "length to pad dm out to", default = 1119, type = int)
+    parser.add_argument("--noise_rate", help = "rate of dm noise", default = 0.09, type = float)
+    parser.add_argument("--noise_max", help = "maximum value of dm noise", default = 50.0, type = float)
+    parser.add_argument("--noise_min", help = "minimum value of dm noise", default = 10.0, type = float)
+    parser.add_argument("--lowratelim", help = "lower limit of rate of dm noise", default = 0.01, type = float)
+    parser.add_argument("--uppratelim", help = "upper limit of rate of dm noise", default = 0.1, type = float)
+    parser.add_argument("--plot_f",action = "store_true", help = "plot a file instead (overrides default behaviour)")
     args = parser.parse_args()
 
-
-    process_directory(args.dir,args.pad_length,args.outdir)
+    if args.plot_f:
+        plot_dm(args.dir,args.pad_length,args.noise_min,args.noise_max,args.noise_rate)
+    else:
+        process_directory(args.dir,args.pad_length,args.outdir,args.noise_min,args.noise_max,args.noise_rate,args.lowratelim,args.uppratelim)
