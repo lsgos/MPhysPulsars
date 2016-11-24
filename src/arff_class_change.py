@@ -35,12 +35,12 @@ def make_arff_name(name):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--categarff","-c", help = "arff file containing all data from original input file with a new category value", default = "htru2_msp_newcateg.arff")
+    parser.add_argument("--fileoutarff","-f", help = "arff file containing all data from original input file with a new category value", default = "htru2_msp_newcateg.arff")
     parser.add_argument("--newcateg","-n", help = "new category value", default = "2")
     parser.add_argument("file", help = "the file to process (must be in arff format)")
-    
+
     args = parser.parse_args()
-    
+
     if arff_re.match(args.file) is None:
         raise IOError("Target file must be in arff format")
 
@@ -57,14 +57,13 @@ if __name__ == "__main__":
             new_fields.append(args.newcateg+"\n")
             new_line = ",".join(new_fields)
             newcateg_lines.append(new_line)
-           
+
     #write target file
-    args.categarff = make_arff_name(args.categarff)
-    
-    with open(args.categarff,'w') as f:
+    args.fileoutarff = make_arff_name(args.fileoutarff)
+
+    with open(args.fileoutarff,'w') as f:
         for h in header:
             f.write(h)
-            
+
         for t in newcateg_lines:
             f.write(t)
-        
