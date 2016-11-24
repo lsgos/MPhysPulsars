@@ -58,7 +58,7 @@ if __name__ == "__main__":
             quit()
 
     #iterate through the range of period cutoffs
-    cutoffs = range(20,200,100)
+    cutoffs = range(20,500,5)
     d = []
     if args.plot is None:
         for cutoff in cutoffs:

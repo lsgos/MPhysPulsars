@@ -175,9 +175,9 @@ class Evaluator:
         Print the output in a simplified format: just the recall for each classifier, then the recall on the labelled set
         """
         for name,(metrics,msp_metrics, t_stats) in self.metrics:
-            recall = metrics[2][0]
-            msp_recall,_ = msp_metrics
-            print(recall, msp_recall, end = " ")
+            recall,r_stdev = metrics[2]
+            msp_recall, m_stdev = msp_metrics
+            print(recall, r_stdev, msp_recall, m_stdev, end = " ")
         print()
 
     def dump_classifiers(self, savepath):
