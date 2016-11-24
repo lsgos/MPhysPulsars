@@ -6,5 +6,8 @@ PulsarFeatureLab/
 *.tar.gz
 testdata/
 *~
+**/#*
+**/.#*
+.*#
 Useful_FRB_stuff/
 venv/

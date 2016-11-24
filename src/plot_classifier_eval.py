@@ -63,5 +63,5 @@ if __name__ == "__main__":
 
     plt.figure()
     for d in datafields:
-        plt.plot(cutoffs,datafields)
+        plt.plot(cutoffs,d)
     plt.show()
