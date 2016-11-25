@@ -158,7 +158,7 @@ class Evaluator:
                 else:
                     strp = str(p)
                 strp.format()
-                print("Accuracy (recall) on labelled MSPs only: {:.3} +/- {:.3}. P value is {}".format(m,stdev,strp))
+                print("Accuracy (recall) on labelled MSPs only: {:.3}, stdev {:.3}. P value is {}".format(m,stdev,strp))
     def pretty_print_test_stats(self):
         assert self.test_metrics is not None, "test metrics have not been calculated yet"
 
@@ -168,7 +168,7 @@ class Evaluator:
             if self.termcolor:
                 name = termcolor.colored(name,'cyan')
             mean,stdev = metric
-            print("{}: {} +/- {}".format(name, mean,stdev))
+            print("{}: {}, stdev {}".format(name, mean,stdev))
 
     def print_simple_output(self):
         """
@@ -190,7 +190,7 @@ class Evaluator:
 
     def print_metrics(self, metrics):
         for l,(m, stdev) in zip(self.metric_labels, metrics):
-            print("{} {:.4f} +/- {:.4f}, ".format(l,m, stdev), end = '')
+            print("{} {:.4f} stdev {:.4f}, ".format(l,m, stdev), end = '')
         print("")
 
 
