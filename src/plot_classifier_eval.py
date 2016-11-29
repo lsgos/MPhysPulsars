@@ -35,13 +35,16 @@ if __name__ == "__main__":
     parser.add_argument("--data",help = "Dataset to analyse. Must be in arff format")
     parser.add_argument("--plot", help = "Precomputed data to plot")
     parser.add_argument("--n_jobs", help = "Number of cores to use", default = "4")
+    parser.add_argument("cutofflow", help = "lower bound for cutoffs", type = int, default = 20)
+    parser.add_argument("cutoffhi", help = "upper bound for cutoffs", type = int, default = 200)
+    parser.add_argument("cutoffstep", help = "step for cutoff. Cutoff  = range(cutofflow, cutoffhi, cutoffstep)", type = int, default = 5)
     args = parser.parse_args()
 
     assert args.data is not None or args.plot is not None,"One of --data or --plot must be provided"
 
     SRC = os.path.join(args.MPhysPath, 'src')
 
-    #sanity check: check we have the required files
+    #sanity checks: check we have the required files
     try:
         assert(os.path.exists(os.path.join(SRC,"arff_msp_comment.py")))
         assert(os.path.exists(os.path.join(SRC,"evaluate_classifier.py")))
@@ -49,16 +52,28 @@ if __name__ == "__main__":
         print "Cannot find required python source files: are you running this file in the correct location? Consider setting the MPhysPath option manually"
         quit()
     try:
-        assert(os.path.exists(args.data))
+        assert(os.path.exists(args.data)),"Cannot find required data file, exiting..."
     except:
-        try:
-            assert(os.path.exists(args.plot))
-        except:
-            print "Cannot find required data file, exiting..."
-            quit()
-
+        assert(os.path.exists(args.plot)),"Cannot find required data file, exiting..."
+      
+    assert args.cutoffhi > args.cutofflow,"Cutoff upper bound must be greater than lower bound"
+      
+    if args.cutofflow < 20:
+        print "WARNING: specifying a cutoff that is very low may result in no pulsars being in the test set. This is likely to cause this script to crash"
+        
+        while args.cutofflow < 20:
+            print "Provide a cutoff lower bound greater than 20, or type 'c' to use current value"
+            str = raw_input("-->")
+            if str == 'c':
+                break
+            try:
+                args.cutofflow = int(str)
+            except ValueError:
+                print "Unable to parse input as int: please valid input"
+            
     #iterate through the range of period cutoffs
-    cutoffs = range(20,500,5)
+    cutoffs = range(args.cutofflow,args.cutoffhi,args.cutoffstep)
+    assert len(cutoffs) > 0, "Cutoff range resulted in a list of length zero"
     d = []
     if args.plot is None:
         for cutoff in cutoffs:
