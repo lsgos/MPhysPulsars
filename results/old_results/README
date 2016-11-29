@@ -1,0 +1,5 @@
+These files are 'old' since they were generated before a bug in 
+evaluate_classifier.py was fixed. All cross-val statistics that
+depend on the FP and FN rate in these files are suspect, but 
+they may still contain useful information. However, you have 
+been warned: here be dragons.`
