@@ -170,8 +170,8 @@ class ClassifierStats:
         """
 
         self.TN = float(confusionMatrix[0][0]) # Negatives correctly receiving negative label.
-        self.FN = float(confusionMatrix[0][1]) # Positives incorrectly receiving negative label.
-        self.FP = float(confusionMatrix[1][0]) # Negatives incorrectly receiving positive label.
+        self.FN = float(confusionMatrix[1][0]) # Positives incorrectly receiving negative label.
+        self.FP = float(confusionMatrix[0][1]) # Negatives incorrectly receiving positive label.
         self.TP = float(confusionMatrix[1][1]) # Positives correctly receiving positive label.
 
     # ****************************************************************************************************
