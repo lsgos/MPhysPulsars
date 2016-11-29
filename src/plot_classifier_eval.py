@@ -20,6 +20,26 @@ from matplotlib import patches as mpatches
 
 clf_list = ["DT", "MLP", "NB","SVM","RF","AdB"]
 
+def get_noise_prop(filename):
+    #Parse an arff file and return the proportion of noise to labelled msp's.
+    n_noise = 0
+    n_msp = 0
+    with open(filename,'r') as f:
+        for l in f:
+            line = l.strip()
+            if line == "":
+                continue
+            elif line[0] == '@' or line.startswith("%"):
+                continue
+            elif "%***MSP***" in line:
+                n_msp+=1
+            else:
+                fields = line.split(',')
+                if int(fields[-1]) == 0:
+                    n_noise+=1
+            
+    return n_msp*1.0 / n_noise
+
 def parse_evaluation_line(line):
     """parse the output of the evaluate_classifier program"""
     
@@ -75,6 +95,7 @@ if __name__ == "__main__":
     cutoffs = range(args.cutofflow,args.cutoffhi,args.cutoffstep)
     assert len(cutoffs) > 0, "Cutoff range resulted in a list of length zero"
     d = []
+    noise_ratio = []
     if args.plot is None:
         for cutoff in cutoffs:
 
@@ -83,6 +104,7 @@ if __name__ == "__main__":
                 subprocess.check_call(["python",os.path.join(SRC,"arff_msp_comment.py"),"-p", repr(cutoff),args.data], stdout = f)
             #get a simplified version of the output file
                 output = subprocess.check_output(["python", os.path.join(SRC,"evaluate_classifier.py"),"--show_msp_results","--simple_output","-j",args.n_jobs,f.name])
+                noise_ratio.append(get_noise_prop(f.name)) 
                 for line in output.split('\n'):
                     l = None
                     if line.strip() != "":
@@ -101,7 +123,7 @@ if __name__ == "__main__":
     num_lines = len(datafields)
     cols = [plt.cm.Set1(x) for x in np.linspace(0,1,num_lines)]
 
-    plt.figure()
+    plt.figure(1)
     
     for c,dat in zip(cols, [datafields[i:i+4] for i in xrange(0,len(datafields),4)]):
         
@@ -122,7 +144,10 @@ if __name__ == "__main__":
     plt.legend(handles=[dash_line,solid_line]+predleg,
                loc=4)
 
-
+    plt.figure(2)
+    plt.xlabel('Period Cutoff')
+    plt.ylabel('Number of candidates below cutoff / number of noise candidates')
+    plt.plot(cutoffs,noise_ratio)
 
     #write to a file to save running the whole program again
     try:
