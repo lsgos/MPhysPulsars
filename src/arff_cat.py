@@ -32,7 +32,7 @@ parser = argparse.ArgumentParser(description = "Concatenates two arff files into
         a single file. Assumes that they share a header: if this is not the case\
         the output will not be a valid arff file. Prints to stdout")
 parser.add_argument('files', nargs='+', help = 'list of files to concatenate')
-parser.add_argument('--shuffle','-s', type = bool, default = False, help = "If set to true, shuffle the order of the data points")
+parser.add_argument('--shuffle','-s', action = 'store_true', help = "If set to true, shuffle the order of the data points")
 
 args = parser.parse_args()
 header = None
