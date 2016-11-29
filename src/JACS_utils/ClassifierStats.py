@@ -164,6 +164,7 @@ class ClassifierStats:
                                  FalsePositives = confusionMatrix[1][0] # Negatives incorrectly receiving positive label.
                                  TruePositives  = confusionMatrix[1][1] # Positives correctly receiving positive label.
 
+                                 #THIS IS WRONG! 
                                  Will not evaluate the performance of multi-class classifiers.
 
         Returns:    N/A.
