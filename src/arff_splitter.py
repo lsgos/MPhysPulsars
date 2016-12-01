@@ -4,6 +4,7 @@ less than a specified value, and the rest of the data with those entries removed
 """
 import argparse
 import re
+import numpy as np
 
 arff_re = re.compile(".*\.arff")
 
@@ -28,12 +29,13 @@ def make_arff_name(name):
     if arff_re.match(name) is None:
         name = name + '.arff'
     return name
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
     description = "Split an arff file by period (assumed to be the first data field) a file, msp, containing all datapoints that pass both conditions, another, pulsar, that fails the period condition but passes the pulsar condition and another, noise, containing the remaining data")
-    parser.add_argument("--msp","-t", help = "arff file containing all datapoints that passed the msp and general pulsar conditions", default = "msp.arff")
+    parser.add_argument("--msp","-m", help = "arff file containing all datapoints that passed the msp and general pulsar conditions", default = "msp.arff")
     parser.add_argument("--pulsar","-u", help = "arff file containing all datapoints that failed the msp condition but passed the pulsar condition", default = "pulsar.arff")
-    parser.add_argument("--noise","-r", help = "arff file containing all datapoints that failed both conditions", default = "noise.arff")
+    parser.add_argument("--noise","-n", help = "arff file containing all datapoints that failed both conditions", default = "noise.arff")
     parser.add_argument("--splitthresh","-s", help = "Value to split pulsars by", type = float, default = 31.0)
     parser.add_argument("--periodfield","-p", help = "Period field (default 1)")
     parser.add_argument("file", help = "the file to process (must be in arff format)")
@@ -48,6 +50,7 @@ if __name__ == "__main__":
         msp_lines = []
         pulsar_lines = []
         noise_lines = []
+
         for line in f:
             if line.strip() == "":
                 continue
@@ -68,18 +71,21 @@ if __name__ == "__main__":
     args.pulsar = make_arff_name(args.pulsar)
     args.noise = make_arff_name(args.noise)
 
-    with open(args.msp,'w') as f:
-        for h in header:
-            f.write(h)
-        for t in msp_lines:
-            f.write(t)
-    with open(args.pulsar,'w') as f:
-        for h in header:
-            f.write(h)
-        for t in pulsar_lines:
-            f.write(t)
-    with open(args.noise,'w') as f:
-        for h in header:
-            f.write(h)
-        for t in noise_lines:
-            f.write(t)
+    if args.msp is not None:
+        with open(args.msp,'w') as f:
+            for h in header:
+                f.write(h)
+            for t in msp_lines:
+                f.write(t)
+    if args.pulsar is not None:
+        with open(args.pulsar,'w') as f:
+            for h in header:
+                f.write(h)
+            for t in pulsar_lines:
+                f.write(t)
+    if args.noise is not None:
+        with open(args.noise,'w') as f:
+            for h in header:
+                f.write(h)
+            for t in noise_lines:
+                f.write(t)
