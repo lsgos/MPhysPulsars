@@ -33,6 +33,7 @@ def make_arff_name(name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
     description = "Split a noise arff file by period (assumed to be the first data field) a file, noise, containing all datapoints that pass period and cutoff tests, and another, noisedump, containing the remaining data")
+    parser.add_argument("--noisered","-n", help = "arff file containing all datapoints that failed both conditions")
     parser.add_argument("--noisered","-n", help = "arff file containing all datapoints that failed both conditions", default = "noise_reduced.arff")
     parser.add_argument("--noisedump","-d", help = "arff file containing all datapoints to be disarded to balance the training sets", default = "noise_dump.arff")
     parser.add_argument("--splitthresh","-s", help = "Value to split period by", type = float, default = 31.0)
@@ -50,7 +51,7 @@ if __name__ == "__main__":
 
     with open(args.file) as f:
         header = parse_arff_header(f)
-        noise_lines = []
+        lines_red = []
         noise_dump_lines = []
 
         for line in f:
@@ -62,12 +63,10 @@ if __name__ == "__main__":
             category = int(fields[-1])
             dump_tag = np.random.random()
             # split off MSPs
-            if (category == args.splitclass and period < args.splitthresh and dump_tag >= args.dumpthresh) or (category == args.splitclass and period >= args.splitthresh):
-                noise_lines.append(line)
-            elif category != args.splitclass:
-                continue
-            else:
+            if (category == args.splitclass and period < args.splitthresh and dump_tag <= args.dumpthresh):
                 noise_dump_lines.append(line)
+            else:
+                lines_red.append(line)
 
     #write target files
     args.noisered = make_arff_name(args.noisered)
