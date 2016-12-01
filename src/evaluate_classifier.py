@@ -256,7 +256,7 @@ if __name__ == "__main__":
                         help = "Whether to show seperate cross-validation metrics \
                         for msp's based on comment tags (***MSP***) in the arff file (default false)")
     parser.add_argument("--no_termcolor", help = "If the termcolor library is present, \
-                        print with pretty colors. default true", action = "store_false")
+                        print with pretty colors. default true", action = "store_true")
 
     parser.add_argument("--simple_output", help = "If this flag is present, print results in an easily parsable, less human readable format", action = "store_true")
     args = parser.parse_args()
