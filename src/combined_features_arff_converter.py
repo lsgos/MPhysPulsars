@@ -31,6 +31,10 @@ if __name__ == "__main__":
         for line in f:
             if line[0] == '@':
                 continue
+            line = line.strip()
+            if line == "":
+                continue
             else:
                 l = line.split(',')
                 print('{19},{0},{1},{2},{3},{4},{5},{6},{7},{30}'.format(*l),end = "")
+                print() # add newlines removed by strip

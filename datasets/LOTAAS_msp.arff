@@ -1,0 +1,12 @@
+@relation some_pulsars
+@attribute Period numeric
+@attribute Profile_Mean numeric
+@attribute Profile_Sdtdev numeric
+@attribute Profile_Skewness numeric
+@attribute Profile_Kurtosis numeric
+@attribute DM_SNR_Mean numeric
+@attribute DM_SNR_Stddev numeric
+@attribute DM_SNR_Skewness numeric
+@attribute DM_SNR_Kurtosis numeric
+@attribute class {0,1}
+@data
