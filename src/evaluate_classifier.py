@@ -273,7 +273,7 @@ if __name__ == "__main__":
         print ("Unable to parse selected features: please specify a \
                 valid list of integers in the range [0,8]")
         print ("Feature 0 = Period, Features 1-8: See Lyon et. al.")
-        quit()
+        raise v
 
     arff_reader = ARFF()
     try:
@@ -283,10 +283,10 @@ if __name__ == "__main__":
 
     except IOError as e:
         print("Cannot open training data file: does it exist?")
-        quit()
+        raise e
     except AssertionError as e:
         print("Cannot provide seperate MSP validation if no data points are labelled as msp's. Msp's should be labelled with a %***MSP*** comment in the arff file")
-        quit()
+        raise e
 
     #select features
     train_x = train_x[:,selected_features]
@@ -303,7 +303,7 @@ if __name__ == "__main__":
             test_x = test_x[:,selected_features]
         except IOError as e:
             print("Cannot open testing file: does it exist?")
-            quit()
+            raise e
         evaluator.calculate_test(test_x,test_y)
 
     #printing of output
