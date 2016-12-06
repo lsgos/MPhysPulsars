@@ -74,12 +74,12 @@ if __name__ == "__main__":
                 lines_red.append(line)
 
     #write target files
-    #args.noisered = make_arff_name(args.noisered)
-    #args.noisedump = make_arff_name(args.noisedump)
-    for l in header + lines_red:
-        print(l,end = "")
+    args.noisered = make_arff_name(args.noisered)
+    args.noisedump = make_arff_name(args.noisedump)
+    """for l in header + lines_red:
+        print(l,end = "")"""
 
-    """if args.noisered is not None:
+    if args.noisered is not None:
         with open(args.noisered,'w') as f:
             for h in header:
                 f.write(h)
@@ -90,4 +90,4 @@ if __name__ == "__main__":
             for h in header:
                 f.write(h)
             for t in noise_dump_lines:
-                f.write(t)"""
+                f.write(t)

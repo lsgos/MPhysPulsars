@@ -45,6 +45,7 @@ def parse_evaluation_line(line):
     """parse the output of the evaluate_classifier program"""
 
     line = line.strip()
+    
     fields =  [float(n) for n in line.split(' ')] if line != "" else None
     return fields
 
@@ -56,9 +57,10 @@ if __name__ == "__main__":
     parser.add_argument("--data",help = "Dataset to analyse. Must be in arff format")
     parser.add_argument("--plot", help = "Precomputed data to plot")
     parser.add_argument("--n_jobs", help = "Number of cores to use", default = "4")
-    parser.add_argument("cutofflow", help = "lower bound for cutoffs", type = int, default = 20)
-    parser.add_argument("cutoffhi", help = "upper bound for cutoffs", type = int, default = 200)
-    parser.add_argument("cutoffstep", help = "step for cutoff. Cutoff  = range(cutofflow, cutoffhi, cutoffstep)", type = int, default = 5)
+    parser.add_argument("--dumpperiod", help = "Period at which to stop noise_dumper's noise reduction", type = float, default = 31.0) 
+    parser.add_argument("cutofflow", help = "lower bound for cutoffs", type = float, default = 0.05)
+    parser.add_argument("cutoffhi", help = "upper bound for cutoffs", type = float, default = 0.99)
+    parser.add_argument("cutoffstep", help = "step for cutoff. Cutoff  = range(cutofflow, cutoffhi, cutoffstep)", type = float, default = 0.01)
     args = parser.parse_args()
 
     assert args.data is not None or args.plot is not None,"One of --data or --plot must be provided"
@@ -67,7 +69,7 @@ if __name__ == "__main__":
 
     #sanity checks: check we have the required files
     try:
-        assert(os.path.exists(os.path.join(SRC,"arff_msp_comment.py")))
+        assert(os.path.exists(os.path.join(SRC,"noise_dumper.py")))
         assert(os.path.exists(os.path.join(SRC,"evaluate_classifier.py")))
     except AssertionError as e:
         print "Cannot find required python source files: are you running this file in the correct location? Consider setting the MPhysPath option manually"
@@ -79,11 +81,11 @@ if __name__ == "__main__":
 
     assert args.cutoffhi > args.cutofflow,"Cutoff upper bound must be greater than lower bound"
 
-    if args.cutofflow < 20:
-        print "WARNING: specifying a cutoff that is very low may result in no pulsars being in the test set. This is likely to cause this script to crash"
+    if args.cutofflow < 0.01:
+        print "WARNING: specifying a cutoff that is very low may result in no noise reduction."
 
-        while args.cutofflow < 20:
-            print "Provide a cutoff lower bound greater than 20, or type 'c' to use current value"
+        while args.cutofflow < 0.01:
+            print "Provide a cutoff lower bound greater than 0.01, or type 'c' to use current value"
             str = raw_input("-->")
             if str == 'c':
                 break
@@ -93,7 +95,7 @@ if __name__ == "__main__":
                 print "Unable to parse input as int: please valid input"
 
     #iterate through the range of period cutoffs
-    cutoffs = range(args.cutofflow,args.cutoffhi,args.cutoffstep)
+    cutoffs = np.arange(args.cutofflow,args.cutoffhi,args.cutoffstep)
     assert len(cutoffs) > 0, "Cutoff range resulted in a list of length zero"
     d = []
     noise_ratio = []
@@ -102,9 +104,12 @@ if __name__ == "__main__":
 
             with tempfile.NamedTemporaryFile() as f:
             #comment out pulsars below cutoff, writing the output to a temporary file
-                subprocess.check_call(["python",os.path.join(SRC,"arff_msp_comment.py"),"-p", repr(cutoff),args.data], stdout = f)
+                #subprocess.check_call(["python",os.path.join(SRC,"arff_msp_comment.py"),"-p", repr(cutoff),args.data], stdout = f)
 
-                subprocess.check_call(["python",os.path.join(SRC,"noise_dumper.py"),"-t",repr(cutoff),args.data])
+                subprocess.check_call(["python",os.path.join(SRC,"noise_dumper.py"),"-t",repr(cutoff),"-s", repr(args.dumpperiod),args.data], stdout = f)
+                
+                #print number of lines in file f
+                
             #get a simplified version of the output file
                 output = subprocess.check_output(["python", os.path.join(SRC,"evaluate_classifier.py"),"--show_msp_results","--simple_output","-j",args.n_jobs,f.name])
 
@@ -123,7 +128,14 @@ if __name__ == "__main__":
                 l = parse_evaluation_line(line)
 
                 d.append(l)
-
+                
+    #write to a file to save running the whole program again
+    try:
+        with open("classifier_eval_results.dat",'w') as f:
+            for l in d:
+                f.write(" ".join([repr(i) for i in l]) + "\n")
+    except:
+        print("failed to write to file")
 
     datafields = zip(*d)
     num_lines = len(datafields)
@@ -138,7 +150,7 @@ if __name__ == "__main__":
         plt.errorbar(cutoffs, m, yerr = mstd, color = c, linestyle = '-')
 
 
-    plt.xlabel('Period Cutoff')
+    plt.xlabel('Deleted Noise Fraction')
     plt.ylabel('Recall')
 
     dash_line = mlines.Line2D([],[], color = 'black', linestyle = '--', label = 'Recall on all data')
@@ -151,16 +163,10 @@ if __name__ == "__main__":
                loc=4)
 
     plt.figure(2)
-    plt.xlabel('Period Cutoff')
-    plt.ylabel('Number of candidates below cutoff / number of noise candidates')
+    plt.xlabel('Deleted Noise Fraction')
+    plt.ylabel('Number of candidates below cutoff / number of noise candidates after reduction')
     plt.plot(cutoffs,noise_ratio)
 
-    #write to a file to save running the whole program again
-    try:
-        with open("classifier_eval_results.dat",'w') as f:
-            for l in d:
-                f.write(" ".join([repr(i) for i in l]) + "\n")
-    except:
-        print("failed to write to file")
+   
 
     plt.show()
