@@ -122,6 +122,14 @@ if __name__ == "__main__":
     datafields = zip(*d)
     num_lines = len(datafields)
     cols = [plt.cm.Set1(x) for x in np.linspace(0,1,num_lines)]
+    #write to a file to save running the whole program again
+    try:
+        with open("classifier_eval_results.dat",'w') as f:
+            for l in d:
+                f.write(" ".join([repr(i) for i in l]) + "\n")
+    except:
+        print("failed to write to file")
+
 
     plt.figure(1)
     
@@ -149,12 +157,28 @@ if __name__ == "__main__":
     plt.ylabel('Number of candidates below cutoff / number of noise candidates')
     plt.plot(cutoffs,noise_ratio)
 
-    #write to a file to save running the whole program again
-    try:
-        with open("classifier_eval_results.dat",'w') as f:
-            for l in d:
-                f.write(" ".join([repr(i) for i in l]) + "\n")
-    except:
-        print("failed to write to file")
+    #attempt to see how the noise ratio explains the cutoff by performing a regression.
+    
+    #collect all the msp only recall data as a single array
+    msp_recalls_and_errors = [(m,std) for _,_,m,std in [datafields[i:i+4] for i in xrange(0,len(datafields),4)]]
+
+    plt.figure(3)
+    for col, (rec, rec_std) in zip(cols,msp_recalls_and_errors):
+    
+        recall_weights = [sigma**(-1) for sigma in rec_std]
+        #calculate a weighted linear fit, and see how much of the recall variation is explained by noise
+        fit, cov = np.polyfit(noise_ratio, rec, 1, w = recall_weights, cov = True)
+        
+        #calculate the R^2 statistic
+        ss_res = sum([(fit[0]*x + fit[1] - y)**2 for (x,y) in zip(noise_ratio, rec)]) # sum of sqaures of residuals
+        y_mean = np.array(rec).mean()
+        ss_tot = sum([(y - y_mean)**2 for y in rec])
+        r2 = 1 - (ss_res/ss_tot)
+
+        plt.errorbar(noise_ratio, rec, yerr = rec_std,color = col, fmt = 'o')
+        plt.plot(noise_ratio, [fit[0]*x + fit[1] for x in noise_ratio], color = col)
+        print r2
+    plt.xlabel('MSP to Noise Ratio for different cutoffs')
+    plt.ylabel('MSP Recall')
 
     plt.show()
