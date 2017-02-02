@@ -45,7 +45,7 @@ from sklearn.ensemble import AdaBoostClassifier
 #Helper functions. These cannot go in the class because we are using parallel computation
 
 
-def _calculate_metrics(classifier,x,y,msp_label, show_msp_results, split_tup):
+def _calculate_metrics(classifier, x, y, msp_label, show_msp_results, split_tup):
 
     train_index, test_index = split_tup
     clf = clone(classifier) #make sure they are not modified outside the loop
@@ -55,18 +55,20 @@ def _calculate_metrics(classifier,x,y,msp_label, show_msp_results, split_tup):
     msp_label_test = msp_label[test_index]
     clf.fit(x_train, y_train)
     #calculate cross validation metrics
-    metrics =  fit_metrics(clf,x_test,y_test)
+    metrics = fit_metrics(clf, x_test, y_test)
 
     #split off msps if this flag is set
     if show_msp_results:
-        msp_x_test = x_test[np.where(msp_label_test)]  #should there be a test in case this is of zero length?
+        msp_x_test = x_test[np.where(msp_label_test)]
+        #should there be a test in case this is of zero length?
         msp_y_test = y_test[np.where(msp_label_test)]
         if len(msp_x_test) == 0:
             #No msp's in this fold: could happen
-            return (metrics,[None])
-        msp_metrics = [clf.score(msp_x_test, msp_y_test)] #only the accuracy is really meaningful here
-        return (metrics,msp_metrics)
-    return (metrics,[None])
+            return (metrics, [None])
+        msp_metrics = [clf.score(msp_x_test, msp_y_test)]
+        #only the accuracy is really meaningful here
+        return (metrics, msp_metrics)
+    return (metrics, [None])
 
 def fit_metrics(classifier, x_test, y_test):
     #calculate statistics for a trained classifier on a test set
@@ -118,19 +120,19 @@ class Evaluator:
         self.n_jobs = n_jobs
 
         self.classifiers = []
-        self.classifiers.append(("CART_tree",DecisionTreeClassifier() ) )
-        self.classifiers.append(("MLP",Pipeline([('scaler', StandardScaler()),('mlp',MLPClassifier())]) ) )
-        self.classifiers.append(("Naive_Bayes",GaussianNB() ) )
-        self.classifiers.append(("SVM",Pipeline([('scaler', StandardScaler()), ('svc',SVC(class_weight = 'balanced') )])))
-        self.classifiers.append(("Random_Forest",RandomForestClassifier() ))
-        self.classifiers.append(("AdaBoost", AdaBoostClassifier() ))
-        self.metric_labels = ["G-Mean","F-Score","Recall","Precision","Specificity","FPR","Accuracy"]
+        self.classifiers.append(("CART_tree", DecisionTreeClassifier()))
+        self.classifiers.append(("MLP", Pipeline([('scaler', StandardScaler()), ('mlp',MLPClassifier())])))
+        self.classifiers.append(("Naive_Bayes", GaussianNB()))
+        self.classifiers.append(("SVM", Pipeline([('scaler', StandardScaler()), ('svc',SVC(class_weight ='balanced'))])))
+        self.classifiers.append(("Random_Forest", RandomForestClassifier()))
+        self.classifiers.append(("AdaBoost", AdaBoostClassifier()))
+        self.metric_labels = ["G-Mean", "F-Score", "Recall", "Precision", "Specificity", "FPR", "Accuracy"]
 
         self.metrics = None
         self.test_metrics = None
 
         if self.termcolor:
-            self.metric_labels = map(lambda s: termcolor.colored(s,'cyan'), self.metric_labels)
+            self.metric_labels = map(lambda s: termcolor.colored(s, 'cyan'), self.metric_labels)
 
     def calculate(self):
         with joblib.Parallel(n_jobs = self.n_jobs) as parallel_workers:
@@ -289,6 +291,7 @@ if __name__ == "__main__":
         raise e
 
     #select features
+
     train_x = train_x[:,selected_features]
 
     evaluator = Evaluator(train_x,train_y, train_labelled_msp, args.k_folds, args.n_jobs,args.show_msp_results, use_termcolor = TERMCOLOR)

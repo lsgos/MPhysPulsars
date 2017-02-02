@@ -1,0 +1,19 @@
+	----------CROSS VALIDATION RESULTS--------------
+CART_tree:
+G-Mean 0.9074 stdev 0.0055, F-Score 0.8430 stdev 0.0087, Recall 0.8426 stdev 0.0102, Precision 0.8435 stdev 0.0147, Specificity 0.9771 stdev 0.0025, FPR 0.0200 stdev 0.0022, Accuracy 0.9599 stdev 0.0024, 
+Accuracy (recall) on labelled MSPs only: 0.63, stdev 0.143. P value is 0.0288336928304
+MLP:
+G-Mean 0.9258 stdev 0.0094, F-Score 0.8956 stdev 0.0124, Recall 0.8657 stdev 0.0178, Precision 0.9279 stdev 0.0179, Specificity 0.9901 stdev 0.0027, FPR 0.0086 stdev 0.0024, Accuracy 0.9742 stdev 0.0030, 
+Accuracy (recall) on labelled MSPs only: 0.605, stdev 0.128. P value is 0.00855168682552
+Naive_Bayes:
+G-Mean 0.8400 stdev 0.0065, F-Score 0.7100 stdev 0.0125, Recall 0.7440 stdev 0.0110, Precision 0.6792 stdev 0.0197, Specificity 0.9484 stdev 0.0046, FPR 0.0450 stdev 0.0040, Accuracy 0.9223 stdev 0.0042, 
+Accuracy (recall) on labelled MSPs only: 0.454, stdev 0.087. P value is 0.00159712141698
+SVM:
+G-Mean 0.9484 stdev 0.0052, F-Score 0.8897 stdev 0.0063, Recall 0.9194 stdev 0.0099, Precision 0.8619 stdev 0.0054, Specificity 0.9784 stdev 0.0009, FPR 0.0188 stdev 0.0008, Accuracy 0.9709 stdev 0.0016, 
+Accuracy (recall) on labelled MSPs only: 0.695, stdev 0.0632. P value is 0.00211923148986
+Random_Forest:
+G-Mean 0.9122 stdev 0.0101, F-Score 0.8847 stdev 0.0105, Recall 0.8393 stdev 0.0190, Precision 0.9356 stdev 0.0093, Specificity 0.9915 stdev 0.0014, FPR 0.0074 stdev 0.0012, Accuracy 0.9721 stdev 0.0023, 
+Accuracy (recall) on labelled MSPs only: 0.553, stdev 0.123. P value is 0.00690643367033
+AdaBoost:
+G-Mean 0.9133 stdev 0.0150, F-Score 0.8836 stdev 0.0190, Recall 0.8422 stdev 0.0268, Precision 0.9295 stdev 0.0123, Specificity 0.9907 stdev 0.0015, FPR 0.0082 stdev 0.0014, Accuracy 0.9717 stdev 0.0044, 
+Accuracy (recall) on labelled MSPs only: 0.577, stdev 0.133. P value is 0.00669547186613

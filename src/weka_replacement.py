@@ -56,7 +56,7 @@ def main():
             print "Cannot find that colormap, using default..."
             colmap = plt.cm.Accent
 
-    plt.scatter(data[:,args.x], data[:,args.y], c = data[:,args.c], cmap = colmap, marker = 'x')
+    plt.scatter(data[:,args.x], data[:,args.y], c = data[:,args.c], cmap = colmap, marker = 'o')
     if args.xlabel is not None:
         plt.xlabel(args.xlabel)
     else:
