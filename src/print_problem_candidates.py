@@ -32,7 +32,7 @@ def main():
     args = parser.parse_args()
     arff_reader = ARFF.ARFF()
     data, labels, _ = arff_reader.read(args.arff)
-    data = data[:, range(1,9)]
+    data = data[:, range(1, 9)]
 
     classifiers = []
     classifiers.append(("CART_tree",
