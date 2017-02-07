@@ -32,6 +32,7 @@ def main():
     args = parser.parse_args()
     arff_reader = ARFF.ARFF()
     data, labels, _ = arff_reader.read(args.arff)
+    period = data[:1]
     data = data[:, range(1,9)]
 
     classifiers = []
@@ -48,9 +49,11 @@ def main():
                         RandomForestClassifier()))
     classifiers.append(("AdaBoost", AdaBoostClassifier()))
     #problem_cand_list = []
+    misclass_set = set()
+    first = True
     for _, clf in classifiers:
         skf = StratifiedKFold(n_splits=5)
-        #misclass_set = set()
+        sub_misc_set = set()
         for train_inds, test_inds in skf.split(data, labels):
             train_x, test_x = data[train_inds], data[test_inds]
             train_y, test_y = labels[train_inds], labels[test_inds]
@@ -60,12 +63,19 @@ def main():
                              in zip(test_x, test_y, pred_y)
                              if y == 1 and y != y_]
             for m in misclassified:
-                print " ".join([repr(i) for i in m])
+                string =  " ".join([repr(i) for i in m])
+                sub_misc_set.add(string)
+        if first:
+            misclass_set = sub_misc_set
+            first = False
+        else:
+            misclass_set.intersection_update(sub_misc_set)
     #problem_cands = problem_cand_list[0]
     #for probset in problem_cand_list[1:]:
     #    problem_cands.intersection_update(probset)
+    for count, x in enumerate(misclass_set):
+        print x
+        print count
 
- 
 if __name__ == "__main__":
     main()
-
