@@ -33,7 +33,7 @@ def main():
     arff_reader = ARFF.ARFF()
     data, labels, _ = arff_reader.read(args.arff)
     period = data[:1]
-    data = data[:, range(1,9)]
+    data_train = data[:, range(1,9)]
 
     classifiers = []
     classifiers.append(("CART_tree",
@@ -55,12 +55,12 @@ def main():
         skf = StratifiedKFold(n_splits=5)
         sub_misc_set = set()
         for train_inds, test_inds in skf.split(data, labels):
-            train_x, test_x = data[train_inds], data[test_inds]
+            train_x, test_x = data_train[train_inds], data_train[test_inds]
             train_y, test_y = labels[train_inds], labels[test_inds]
             clf.fit(train_x, train_y)
             pred_y = clf.predict(test_x)
             misclassified = [row for row, y, y_
-                             in zip(test_x, test_y, pred_y)
+                             in zip(data[test_inds], test_y, pred_y)
                              if y == 1 and y != y_]
             for m in misclassified:
                 string =  " ".join([repr(i) for i in m])
