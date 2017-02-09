@@ -26,4 +26,26 @@ def read(path):
     with open(path) as f:
         return np.array([[float(field) for field in line.split('\t')]
                          for line in [line.strip() for line in f]])
-                         
+def read_dict(path):
+    """
+    return the data as a dict of labelled numpy arrays, in case this is more convenient
+    """
+    data = read(path)
+    data_dict = {}
+    fields = ["SNR",
+              "time_sample",
+              "time_of_peak",
+              "filter_width",
+              "dm_index",
+              "dm",
+              "grouped_cands",
+              "start_time_group",
+              "end_time_group",
+              "no_beams",
+              "beam_mask",
+              "primary_beam",
+              "max_snr",
+              "beam_num"]
+    for ind, field in enumerate(fields):
+        data_dict[field] = data[:, ind]
+    return data_dict

@@ -5,7 +5,6 @@ the screen. Requires classifiers to be pre-trained
 and saved using evaluate_classifier.
 """
 import argparse
-import numpy as np
 
 from sklearn.model_selection import StratifiedKFold
 
@@ -26,13 +25,13 @@ def main():
         description="Print any persistently"
         "missclassified candidates to the screen")
     parser.add_argument(
-        "--arff", "-a",
+        "arff",
         help="arff file containing pulsar data"
     )
     args = parser.parse_args()
     arff_reader = ARFF.ARFF()
     data, labels, _ = arff_reader.read(args.arff)
-    data_train = data[:, range(1,9)]
+    data_train = data[:, range(1, 9)]
 
     classifiers = []
     classifiers.append(("CART_tree",
@@ -61,8 +60,8 @@ def main():
             misclassified = [row for row, y, y_
                              in zip(data[test_inds], test_y, pred_y)
                              if y == 1 and y != y_ and row[0] < 31]
-            for m in misclassified:
-                string =  " ".join([repr(i) for i in m])
+            for cand in misclassified:
+                string = " ".join([repr(i) for i in cand])
                 sub_misc_set.add(string)
         if first:
             misclass_set = sub_misc_set
@@ -72,9 +71,8 @@ def main():
     #problem_cands = problem_cand_list[0]
     #for probset in problem_cand_list[1:]:
     #    problem_cands.intersection_update(probset)
-    for count, x in enumerate(misclass_set):
+    for x in misclass_set:
         print x
-        print count
 
 
 if __name__ == "__main__":
