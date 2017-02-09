@@ -32,7 +32,6 @@ def main():
     args = parser.parse_args()
     arff_reader = ARFF.ARFF()
     data, labels, _ = arff_reader.read(args.arff)
-    period = data[:1]
     data_train = data[:, range(1,9)]
 
     classifiers = []
@@ -61,7 +60,7 @@ def main():
             pred_y = clf.predict(test_x)
             misclassified = [row for row, y, y_
                              in zip(data[test_inds], test_y, pred_y)
-                             if y == 1 and y != y_]
+                             if y == 1 and y != y_ and row[0] < 31]
             for m in misclassified:
                 string =  " ".join([repr(i) for i in m])
                 sub_misc_set.add(string)
@@ -77,7 +76,6 @@ def main():
         print x
         print count
 
- 
+
 if __name__ == "__main__":
     main()
-
