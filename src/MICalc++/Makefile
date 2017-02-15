@@ -1,5 +1,5 @@
 CC=clang++
-CFLAGS=-I/usr/local/include/FEAST -I/usr/local/include/MIToolbox -L/usr/local/lib/ -lFSToolbox -lMIToolbox -std=c++11 
+CFLAGS=-I/usr/local/include/FEAST -L/usr/local/lib/ -lFSToolbox -std=c++11 -O3
 all:
 	$(CC) -o micalc MICalc.cc $(CFLAGS)
 format:
