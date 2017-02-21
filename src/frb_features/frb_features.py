@@ -1,9 +1,14 @@
 """
 A utility to calculate summary statistics for FRB candidate files
 """
-import frb_cand
-from scipy.stats import skew, kurtosis
+from __future__ import print_function
 import os
+import re
+import argparse
+from scipy.stats import skew, kurtosis
+import frb_cand
+
+CAND_FILE_RE = re.compile(r".*allcands_injected$")
 
 class FRB(object):
     """
@@ -40,29 +45,38 @@ class FRB(object):
     def write_features(self):
         """return features as a string to write to a file"""
         feats = [feature() for feature in self.feature_extractors()]
+        #add a placeholder for the class label: can be swapped by bash tools, e.g sed 's/?/1/g'
+        feats.append("?")
         return " ".join([str(feat) for feat in feats])
 
-def map_directories(func, path):
+def map_dirs(func, path):
     """
     applies func to every file in a directory and recurses on every subdir
     """
-    for thing in os.listdir(path):
-        if os.path.isdir(thing):
-            map_directories(func, thing)
+    for f in os.listdir(path):
+        target = os.path.join(path, f)
+        if os.path.isdir(target):
+            map_dirs(func, target)
         else:
-            func(thing)
+            func(target)
     return
 
+def process_file(name):
+    """process all files that match the filename regular expression"""
+    if CAND_FILE_RE.match(name) is not None:
+        frb = FRB(name)
+        print(frb.write_features())
+    return
 
-def main(filename):
+def main():
     """
     program entry point
     """
-    fcalc = FRB(filename)
-    print fcalc.write_features()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("directory", help="directory to search for files")
+    args = parser.parse_args()
+    map_dirs(process_file, args.directory)
 
 
 if __name__ == "__main__":
-    main("HR2258_injected_7p5sigma_cands")
-
-
+    main()

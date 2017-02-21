@@ -48,3 +48,5 @@ def read_dict(path):
     for ind, field in enumerate(fields):
         data_dict[field] = data[:, ind]
     return data_dict
+
+#NB: boxcar width = filter_width * sampling rate (assume 64 ms)

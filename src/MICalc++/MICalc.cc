@@ -43,9 +43,8 @@ std::vector<std::vector<unsigned int>> read_data(std::istream &input) {
   while (input) {
     std::vector<unsigned int> data_row;
     std::getline(input,line);
-    //std::string line = std::string(line);
     line = line.substr(0,line.find_last_not_of(" \t\n") + 1);
-    std::cout << line << std::endl;
+    if (line == "") continue;
     auto row = std::stringstream(line);
     while (!row.eof()) {
       row >> num;
