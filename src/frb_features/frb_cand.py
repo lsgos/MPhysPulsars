@@ -5,6 +5,8 @@ array.
 
 import numpy as np
 
+min_dm = 10
+
 def read(path):
     """
     takes a filename as an argument, and returns the contents of the file as a np array
@@ -14,7 +16,9 @@ def read(path):
     time sample of the peak,
     time in seconds of the peak,
     filter width (multiple of time samples),
-    DM index, DM, grouped candidates,
+    DM index,
+    DM,
+    grouped candidates,
     starting time sample of the group,
     ending time sample of the group,
     number of beams,
@@ -24,8 +28,10 @@ def read(path):
     beam number
     """
     with open(path) as f:
-        return np.array([[float(field) for field in line.split('\t')]
-                         for line in [line.strip() for line in f]])
+        field_list = [[float(field) for field in line.split('\t')]
+                         for line in [line.strip() for line in f]]
+        return np.array( filter(lambda x: x[0] != inf and x[5] > min_dm, field_list) )
+
 def read_dict(path):
     """
     return the data as a dict of labelled numpy arrays, in case this is more convenient
