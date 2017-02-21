@@ -36,14 +36,17 @@ int errorline = 0;
 // get data from file into a 2d std::vector
 std::vector<std::vector<unsigned int>> read_data(std::istream &input) {
   std::vector<std::vector<unsigned int>> data_vec;
-  char line[256];
+  std::string line;
   int num_fields = -1;
   unsigned int num;
   int linenum = 1;
   while (input) {
     std::vector<unsigned int> data_row;
-    input.getline(line, 256);
-    auto row = std::stringstream(std::string(line));
+    std::getline(input,line);
+    //std::string line = std::string(line);
+    line = line.substr(0,line.find_last_not_of(" \t\n") + 1);
+    std::cout << line << std::endl;
+    auto row = std::stringstream(line);
     while (!row.eof()) {
       row >> num;
       if (row.fail()) {
@@ -204,8 +207,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Encountered non integer input in " << filename << " at line "
               << errorline
               << ", please ensure file contains only discretised input"
-              << std::endl
-              << "(This error can be caused by trailing whitespace)"
               << std::endl
               << "Exiting..." << std::endl;
     return 1;
