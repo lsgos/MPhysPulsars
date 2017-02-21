@@ -11,13 +11,12 @@
 // 1 1 3 2 1 1 2
 // 9 9 3 8 1 3 2
 
-#define COMPILE_C // neccesary to make FSAlgorithms not try to behave in a
-                  // matlab way
+#define COMPILE_C // neccesary to make FSAlgorithms not try to import mex.h
 extern "C" {
 #include "FSAlgorithms.h"
 }
 
-#include "unistd.h"
+#include "getopt.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -37,14 +36,16 @@ int errorline = 0;
 // get data from file into a 2d std::vector
 std::vector<std::vector<unsigned int>> read_data(std::istream &input) {
   std::vector<std::vector<unsigned int>> data_vec;
-  char line[256];
+  std::string line;
   int num_fields = -1;
   unsigned int num;
   int linenum = 1;
   while (input) {
     std::vector<unsigned int> data_row;
-    input.getline(line, 256);
-    auto row = std::stringstream(std::string(line));
+    std::getline(input,line);
+    line = line.substr(0,line.find_last_not_of(" \t\n") + 1);
+    if (line == "") continue;
+    auto row = std::stringstream(line);
     while (!row.eof()) {
       row >> num;
       if (row.fail()) {
@@ -124,35 +125,70 @@ void show_help() {
             << "USAGE" << std::endl
             << '\t' << "micalc OPTIONS FILE" << std::endl
             << "OPTIONS: " << std::endl
-            << '\t'
-            << "-k K   : number of features to choose (default number in file)"
+            << '\t' << "-k INT : number of features to choose (default all)"
             << std::endl
-            << '\t' << "-h     : show this message and exit" << std::endl;
+            << '\t' << "-h     : show this message and exit" << std::endl
+            << "FEATURE OPTIONS (if none provided, will calculate all measures and pretty print with titles.)" << std::endl
+            << "Only one feature option will be accepted" << std::endl
+            << '\t' << "--jmi  : rank using the joint mutual information" << std::endl
+            << '\t' << "--mi   : rank using the mutual information" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
   // deal with command line options
   opterr = 0;
   char *filename = nullptr;
-  char c;
+  int c;
   unsigned int k = -1;
+  int jmi_flag = 0;
+  int mi_flag = 0;
+  static struct option long_options[] = {
+    {"jmi", no_argument, &jmi_flag, 1},
+    {"mi",  no_argument, &mi_flag,  1},
+    {0,0,0,0}, 
+  };
+  int flag_tot = 0;
 
-  while ((c = getopt(argc, argv, "hk:")) != -1) {
+  int option_index;
+  while ((c = getopt_long(argc, argv, "hk:", long_options, &option_index)) != -1) {
     switch (c) {
     case 'h':
       show_help();
       return 0;
     case 'k':
-      k = static_cast<uint>(std::stoi(optarg));
+      try {
+        k = static_cast<uint>(std::stoi(optarg));
+      } catch (std::exception){
+        //non numeric argument to k
+        show_help();
+        return -1;
+      }
+      if (k < 1) {
+        show_help();
+        return -1;
+      }
       break;
     case '?':
-      std::cout << "Unrecognised argument " << c << std::endl;
+      show_help();
       return -1;
+    case 'j':
+      break;
+    case 'm':
+      break;
+    case 0:
+      //long option flags: they set their flags automagically
+      break;
     default:
+      std::cout << "hi" << std::endl;
       return -1;
     }
   }
-
+  
+  //check only one specific feature option was provided.
+  flag_tot = jmi_flag + mi_flag; 
+  if (flag_tot > 1 ) {
+    show_help(); return -1;
+  }
   // parse filename
   if (optind != (argc - 1)) {
     // only one option
@@ -170,8 +206,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Encountered non integer input in " << filename << " at line "
               << errorline
               << ", please ensure file contains only discretised input"
-              << std::endl
-              << "(This error can be caused by trailing whitespace)"
               << std::endl
               << "Exiting..." << std::endl;
     return 1;
@@ -211,18 +245,38 @@ int main(int argc, char *argv[]) {
   unsigned int MIM_output_features[k];
   double MIM_scores[k];
 
-  JMI(k, num_points, num_feats, data_arr, class_arr, JMI_output_features,
+  
+  if (flag_tot == 0) {
+    //show all features with headers
+    JMI(k, num_points, num_feats, data_arr, class_arr, JMI_output_features,
       JMI_scores);
-  MIM(k, num_points, num_feats, data_arr, class_arr, MIM_output_features,
+    MIM(k, num_points, num_feats, data_arr, class_arr, MIM_output_features,
       MIM_scores);
-  std::cout << "--MI--" << std::endl;
-  for (int i = 0; i < k; ++i) {
-    std::cout << MIM_output_features[i] << " " << MIM_scores[i] << std::endl;
+    std::cout << "--MI--" << std::endl;
+    for (int i = 0; i < k; ++i) {
+      std::cout << MIM_output_features[i] << " " << MIM_scores[i] << std::endl;
+    }
+
+    std::cout << "--JMI--" << std::endl;
+    for (int i = 0; i < k; ++i) {
+      std::cout << JMI_output_features[i] << " " << JMI_scores[i] << std::endl;
+    }
+  } else if (jmi_flag) {
+    //show only jmi, no header
+     JMI(k, num_points, num_feats, data_arr, class_arr, JMI_output_features,
+      JMI_scores);
+    for (int i = 0; i < k; ++i) {
+      std::cout << JMI_output_features[i] << " " << JMI_scores[i] << std::endl;
+    }
+  } else if (mi_flag) {
+    //show only mi, no header
+    MIM(k, num_points, num_feats, data_arr, class_arr, MIM_output_features,
+      MIM_scores);
+    for (int i = 0; i < k; ++i) {
+      std::cout << MIM_output_features[i] << " " << MIM_scores[i] << std::endl;
+    }
   }
 
-  std::cout << "--JMI--" << std::endl;
-  for (int i = 0; i < k; ++i) {
-    std::cout << JMI_output_features[i] << " " << JMI_scores[i] << std::endl;
-  }
   delete[] data_arr;
+  return 0;
 }

@@ -1,6 +1,5 @@
 """
-A numpy utitlity to parse the frb candidate files into a numpy
-array.
+A numpy utitlity to parse the frb candidate files into a numpy array.
 """
 
 import numpy as np
@@ -38,7 +37,7 @@ def read_dict(path):
     """
     data = read(path)
     data_dict = {}
-    fields = ["SNR",
+    fields = ["snr",
               "time_sample",
               "time_of_peak",
               "filter_width",
@@ -55,3 +54,5 @@ def read_dict(path):
     for ind, field in enumerate(fields):
         data_dict[field] = data[:, ind]
     return data_dict
+
+#NB: boxcar width = filter_width * sampling rate (assume 64 ms)
