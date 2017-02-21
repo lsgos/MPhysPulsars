@@ -107,9 +107,7 @@ unsigned int **unwrap_array(std::vector<std::vector<unsigned int>> &data) {
   int num_points = data[0].size();
   unsigned int **array = new unsigned int *[num_feats];
   for (int i = 0; i < num_feats; ++i) {
-    array[i] = data[i].data(); // returns a pointer to the vectors underlying
-                               // storage: be a bit careful the vector doesn't
-                               // go out of scope and clean this up
+    array[i] = data[i].data();
   }
   return array;
 }
@@ -133,7 +131,7 @@ void show_help() {
 }
 
 int main(int argc, char *argv[]) {
-  //deal with command line options
+  // deal with command line options
   opterr = 0;
   char *filename = nullptr;
   char c;
@@ -166,7 +164,7 @@ int main(int argc, char *argv[]) {
   std::fstream fs;
   fs.open(filename);
   auto input_data = read_data(fs);
-
+  fs.close();
   switch (errcode) {
   case Error::non_integer_input:
     std::cout << "Encountered non integer input in " << filename << " at line "
