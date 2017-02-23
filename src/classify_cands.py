@@ -20,8 +20,6 @@ import argparse
 from itertools import izip, repeat
 
 
-import time 
-
 from JACS_utils.ARFF import ARFF
 
 class ArffBatch(object):
@@ -78,7 +76,6 @@ class ArffBatch(object):
         """return the data as a lazy generator"""
         while self.running:
             yield self.get_batch(N)
-            print("yielded a batch")
 
 
 
@@ -91,7 +88,6 @@ def compute_predictions( (classifier, (X, paths)) ):
     """
     predictions = classifier.predict(X)
     results = [path for (prediction,path) in zip(list(predictions.astype(np.bool)), paths ) if prediction == 1]
-    time.sleep(5)
     return results
 
 def main():
