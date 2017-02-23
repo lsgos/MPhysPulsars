@@ -1,3 +1,10 @@
+"""
+Calculate the stablility score for a feature selection algorithm, as 
+described in Noguiera and Brown, "Measuring the Stability of Feature 
+Selection
+"""
+
+
 from __future__ import print_function
 import argparse
 import tempfile
@@ -6,14 +13,10 @@ import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from scipy.stats import pearsonr
 import MICalc
-#from JACS_utils import ARFF
-#import pdb;pdb.set_trace()
 
-#args = parser.parse_args()
-#arff_reader = ARFF.ARFF()
-#data, labels, _ = arff_reader.read(args.arff)
-#data_train = data[:, range(1, 9)]
 MICALC_LOCATION = "/home/lewis/MPhysPulsars/src/MICalc++/micalc"
+SUPPORTED_ALGORITHMS = ["jmi","mi"]
+S_ALGS_LONG = ["Joint Mutual Information", "Mutual Information"]
 
 def pearson_stability_score(A):
     """
@@ -29,7 +32,6 @@ def pearson_stability_score(A):
     for that run would be [1,0,0,1,1,0,0,0]. This function expects a 
     matrix A where A = [s_1,s_2 ... s_M].
     """
-    #calculate the cumulative moving average of the mean
     M = A.shape[0]
     sum = 0.0
     for i in xrange(M):
@@ -46,8 +48,16 @@ if __name__ == "__main__":
     parser.add_argument("filename",help="The file containing the dataset. Must be in arff format")
     parser.add_argument("-k", "--num-splits", type = int, help = "number of splits to use when calculating variance", default=10)
     parser.add_argument("-n", "--num-feats", type = int, help = "number of features to select", default = 4)
+    parser.add_argument("-a", "--algorithm", help = "Which feature selection algorithm to evaluate: options: [jmi,mi]", default = "mi")
     args = parser.parse_args()
 
+    if not(args.algorithm in SUPPORTED_ALGORITHMS):
+        print("Unknown algorithm option {}".format(args.algorithm))
+        print("Supported Algorithms: ")
+        for alg,long_alg in zip(SUPPORTED_ALGORITHMS,S_ALGS_LONG): 
+            print("{} ({})".format(alg, long_alg))
+        quit()
+    
     with open(args.filename) as f:
         data = np.array([[int(field) for field in line.split(' ')]
                          for line in [line.strip() for line in f]])
@@ -55,10 +65,9 @@ if __name__ == "__main__":
     features = data[:,0:-1]
     num_features = features.shape[1]
     labels = data[:,-1]
-    stab_array = np.zeros([args.num_splits,num_features])
+    A = np.zeros([args.num_splits,num_features])
 
     skf = StratifiedKFold(n_splits=args.num_splits, shuffle=True)
-    
     
     for run,(_,sub_inds) in enumerate(skf.split(features,labels)):
         sub_feats = features[sub_inds]
@@ -74,10 +83,6 @@ if __name__ == "__main__":
                                       'tmp.dat'])
         selected_features = [int(line.split(' ')[0]) for line in output.split('\n') if line != ""]
         
-        stab_array[run][selected_features] = 1
-        #write dataset to file 
-        #call micalc on dataset 
-        #read output of MICalc
-        #add output to data matrix
-    subprocess.call(["rm", "tmp.dat"])
-    print("Pearson's correlation score: {}".format(pearson_stability_score(stab_array)))
+        A[run][selected_features] = 1
+    subprocess.call(["rm", "tmp.dat"]) #get rid of tempfile
+    print("Pearson's correlation score: {}".format(pearson_stability_score(A)))
