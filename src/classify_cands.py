@@ -32,7 +32,6 @@ class ArffBatch(object):
         self.running = True
     def get_batch(self,N):
         X=[]
-        Y=[]
         paths = []
         with open(self.path) as f:
             if self.current_pos is not None:
@@ -62,12 +61,10 @@ class ArffBatch(object):
                     components = text.split(",")
 
                     features = [float(x) for x in components[0:len(components)-1]]
-                    label    = [int(x)   for x in components[len(components)-1:len(components)]]
                     X.append(features)
-                    Y.append(label)
                     read += 1
                 self.current_pos = f.tell()
-        return np.array(X)[:,1:],paths 
+        return np.array(X),paths 
     def is_open(self):
         return self.running
     def get_batches(self,N):
@@ -134,6 +131,7 @@ def main():
             for res in result:
                 print(res,file = f)
             print("Processed batch {}".format( batch_number) )
+            print("Candidates Processed: {}".format(batch_number * args.batch_size))
     
 
 if __name__ == "__main__":
