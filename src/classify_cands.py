@@ -26,10 +26,11 @@ class ArffBatch(object):
     data files in batches of N at a time
 
     """
-    def __init__(self,path):
+    def __init__(self,path, contains_period = False):
         self.path = path
         self.current_pos = None
         self.running = True
+        self.contains_period = contains_period
     def get_batch(self,N):
         X=[]
         paths = []
@@ -60,14 +61,14 @@ class ArffBatch(object):
                     # Split on comma since ARFF data is in CSV format.
                     components = filter(lambda x: x != "", text.split(","))
 
-                    try:
-			features = [float(x) for x in components[0:len(components)-1] if x != ""]
-		    except:
-			import pdb; pdb.set_trace()
+	            features = [float(x) for x in components[0:len(components)-1] if x != ""]
                     X.append(features)
                     read += 1
                 self.current_pos = f.tell()
-        return np.array(X),paths 
+        if self.contains_period:       
+            return np.array(X)[:,1:], paths #remove the period
+        else:
+            return np.array(X), paths 
     def is_open(self):
         return self.running
     def get_batches(self,N):
@@ -93,6 +94,7 @@ def main():
     parser.add_argument("-d", "--dataset", help = "Dataset to evaluate (arff format)")
     parser.add_argument("-b", "--batch_size", type = int, help = "Number of points to process at a time", default = 10000)
     parser.add_argument("-o", "--output_dir", help="Directory to write output files to", default = "output_batches")
+    parser.add_argument("-p", "--period", help = "If the training file contains the period in adition to lyon's features, this flag must be set to ignore it", action = "store_true")
     args = parser.parse_args()
 
     arff = ARFF()
@@ -117,7 +119,7 @@ def main():
     #avoid reading the entire file into memory as a contigous numpy array, which would likely 
     #either crash or be very slow. The worker pool can handle the batches in parallel, speeding 
     #everything up
-    data = ArffBatch(args.dataset)
+    data = ArffBatch(args.dataset, args.period)
     data_generator = data.get_batches(args.batch_size)
     #spawn a pool of workers as large as the number of cores
     workers = multiprocessing.Pool(multiprocessing.cpu_count())
