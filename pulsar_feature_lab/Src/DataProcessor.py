@@ -79,7 +79,7 @@ def worker( (name,path,feature_type,candidate_type,verbose,meta,arff) ):
     try:
         c = Candidate.Candidate(name,path)
         features = c.getFeatures(feature_type, candidate_type, verbose)
-        if (arff and feature_type > 0 and feature_type < 7):
+        if arff and ((feature_type > 0 and feature_type < 7) or feature_type == 9):
             features.append('?')
         if meta:
             return featureMeta(path,features),None, name
