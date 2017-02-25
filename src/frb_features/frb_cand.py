@@ -29,7 +29,7 @@ def read(path):
     with open(path) as f:
         field_list = [[float(field) for field in line.split('\t')]
                          for line in [line.strip() for line in f]]
-        return np.array( filter(lambda x: x[0] != inf and x[5] > min_dm, field_list) )
+        return np.array( filter(lambda x: x[0] != inf and x[5] > min_dm, field_list) ) #remove infinite SNR candidates caused by RFI straight away, as they will screw up the maths
 
 def read_dict(path):
     """
