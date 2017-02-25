@@ -53,14 +53,17 @@ class ArffBatch(object):
                     if('%' in line):
                         text = line[0:line.index('%')]
                         comment = line[line.index('%'):]
-                        paths.append(comment)
+                        paths.append(comment[1:])
                     else:
                         text = line
                         paths.append("unknown, no path found")
                     # Split on comma since ARFF data is in CSV format.
-                    components = text.split(",")
+                    components = filter(lambda x: x != "", text.split(","))
 
-                    features = [float(x) for x in components[0:len(components)-1]]
+                    try:
+			features = [float(x) for x in components[0:len(components)-1] if x != ""]
+		    except:
+			import pdb; pdb.set_trace()
                     X.append(features)
                     read += 1
                 self.current_pos = f.tell()
