@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#Search for the injected frb. In bash since we can do everything we want to with comm and awk
+#This should print out the line that is the injected FRB, which can then be used to label all
+#the lines in the injected files
+INJECTED=$1
+ORIGINAL=$2
+PROPERTIES=$3
+
+function filter_properties() {
+	#Read the injected features from the .properties file provided
+	STARTTIME=$2
+	DM=$4
+	#search all the lines in injected not duplicated in original, 
+	#and filter by DM and start time of the pulses being within range of the
+	#injected object 
+	comm -23 <(sort $INJECTED) <(sort $ORIGINAL) | awk -e "\$6 < ($DM + 20) && \$6 > ($DM - 20) && \$3 < ($STARTTIME + 20) && \$3 > ($STARTTIME - 20)"  
+}
+
+
+filter_properties $(cat $PROPERTIES)

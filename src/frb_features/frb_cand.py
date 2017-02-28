@@ -3,7 +3,7 @@ A numpy utitlity to parse the frb candidate files into a numpy array.
 """
 
 import numpy as np
-
+from math import isinf
 min_dm = 10
 
 def read(path):
@@ -29,7 +29,7 @@ def read(path):
     with open(path) as f:
         field_list = [[float(field) for field in line.split('\t')]
                          for line in [line.strip() for line in f]]
-        return np.array( filter(lambda x: x[0] != inf and x[5] > min_dm, field_list) ) #remove infinite SNR candidates caused by RFI straight away, as they will screw up the maths
+        return np.array( field_list ) #remove infinite SNR candidates caused by RFI straight away, as they will screw up the maths
 
 def read_dict(path):
     """
@@ -55,4 +55,3 @@ def read_dict(path):
         data_dict[field] = data[:, ind]
     return data_dict
 
-#NB: boxcar width = filter_width * sampling rate (assume 64 ms)
