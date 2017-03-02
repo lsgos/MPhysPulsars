@@ -1,21 +1,45 @@
 #!/bin/bash
 
 #Search for the injected frb. In bash since we can do everything we want to with comm and awk
-#This should print out the line that is the injected FRB, which can then be used to label all
-#the lines in the injected files
-INJECTED=$1
-ORIGINAL=$2
-PROPERTIES=$3
+#The first function prints out the data of the frb. The for loop then cats the contents of the
+#injected file, filtering out the injected frb, adding a zero to the end of every line (since these
+#are non frb candidates), then prints out the informtion of the injected candidate with a one at the
+#end of the line
 
-function filter_properties() {
-	#Read the injected features from the .properties file provided
-	STARTTIME=$2
-	DM=$4
-	#search all the lines in injected not duplicated in original, 
-	#and filter by DM and start time of the pulses being within range of the
-	#injected object 
-	comm -23 <(sort $INJECTED) <(sort $ORIGINAL) | awk -e "\$6 < ($DM + 20) && \$6 > ($DM - 20) && \$3 < ($STARTTIME + 20) && \$3 > ($STARTTIME - 20)"  
+function search_frb() {
+	INJECTED=$1
+	ORIGINAL=$2
+	PROPERTIES=$3
+
+	function filter_properties() {
+		#Read the injected features from the .properties file provided
+		STARTTIME=$2
+		DM=$4
+		#search all the lines in injected not duplicated in original, 
+		#and filter by DM and start time of the pulses being within range of the
+		#injected object 
+		comm -23 <(sort $INJECTED) <(sort $ORIGINAL) | 
+		awk -e "\$6 < ($DM + 30) && \$6 > ($DM - 30) && \$3 < ($STARTTIME + 30) && \$3 > ($STARTTIME - 30)"  |
+		python /home/lewis/MPhysPulsars/scripts/label_injected_help.py $DM $STARTTIME $CAND
+	}
+
+	filter_properties $(cat $PROPERTIES)
+
 }
 
-
-filter_properties $(cat $PROPERTIES)
+TARGET_DIR=$1
+for CAND in $(ls $TARGET_DIR)
+	do 
+	INJECTED_NAME="$TARGET_DIR""/""$CAND""/""injected/""$CAND""_injected.cands"
+	ORIGINAL_NAME="$TARGET_DIR""/""$CAND""/original/""$CAND""_original.cands"
+	PROP_NAME="$TARGET_DIR""/""$CAND""/""$CAND"".properties"
+	FRB_INFO=$(search_frb $INJECTED_NAME $ORIGINAL_NAME $PROP_NAME)
+	#the python script emits a warning message if no candidates were found: just ignore these for now
+	if ! [[ $FRB_INFO =~ 'WARNING' ]]
+		then
+		#cat all the null candidates to the screen with a 'zero' label, and all the positives with a one 
+		cat $INJECTED_NAME| grep -v "$FRB_INFO" | sed 's/$/ 0/' 
+		#cat the info of the injected candidate with a 'one' label
+		echo $FRB_INFO | sed 's/$/ 1/'
+	fi
+done
