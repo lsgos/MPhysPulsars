@@ -33,13 +33,14 @@ for CAND in $(ls $TARGET_DIR)
 	INJECTED_NAME="$TARGET_DIR""/""$CAND""/""injected/""$CAND""_injected.cands"
 	ORIGINAL_NAME="$TARGET_DIR""/""$CAND""/original/""$CAND""_original.cands"
 	PROP_NAME="$TARGET_DIR""/""$CAND""/""$CAND"".properties"
+	OUT_NAME="$TARGET_DIR""/""$CAND""/labelled_dataset.dat"
 	FRB_INFO=$(search_frb $INJECTED_NAME $ORIGINAL_NAME $PROP_NAME)
 	#the python script emits a warning message if no candidates were found: just ignore these for now
 	if ! [[ $FRB_INFO =~ 'WARNING' ]]
 		then
 		#cat all the null candidates to the screen with a 'zero' label, and all the positives with a one 
-		cat $INJECTED_NAME| grep -v "$FRB_INFO" | sed 's/$/ 0/' 
+		cat $INJECTED_NAME| grep -v "$FRB_INFO" | sed 's/\t/ /g' |sed 's/$/ 0/' > $OUT_NAME
 		#cat the info of the injected candidate with a 'one' label
-		echo $FRB_INFO | sed 's/$/ 1/'
+		echo $FRB_INFO | sed 's/$/ 1/' >> $OUT_NAME
 	fi
 done
