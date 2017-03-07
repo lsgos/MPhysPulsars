@@ -1,5 +1,5 @@
 """
-A numpy utitlity to parse the frb candidate files into a numpy array.
+A numpy utility to parse the frb candidate files into a numpy array.
 """
 
 import numpy as np

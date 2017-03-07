@@ -2,7 +2,7 @@
 
 #Search for the injected frb. In bash since we can do everything we want to with comm and awk
 #The first function prints out the data of the frb. The for loop then cats the contents of the
-#injected file, filtering out the injected frb, adding a zero to the end of every line (since these
+#injected file, filtering out the injected frb, adds a zero to the end of every line (since these
 #are non frb candidates), then prints out the informtion of the injected candidate with a one at the
 #end of the line
 
@@ -34,13 +34,19 @@ for CAND in $(ls $TARGET_DIR)
 	ORIGINAL_NAME="$TARGET_DIR""/""$CAND""/original/""$CAND""_original.cands"
 	PROP_NAME="$TARGET_DIR""/""$CAND""/""$CAND"".properties"
 	OUT_NAME="$TARGET_DIR""/""$CAND""/labelled_dataset.dat"
+	
 	FRB_INFO=$(search_frb $INJECTED_NAME $ORIGINAL_NAME $PROP_NAME)
+	
 	#the python script emits a warning message if no candidates were found: just ignore these for now
+	
 	if ! [[ $FRB_INFO =~ 'WARNING' ]]
 		then
-		#cat all the null candidates to the screen with a 'zero' label, and all the positives with a one 
-		cat $INJECTED_NAME| grep -v "$FRB_INFO" | sed 's/\t/ /g' |sed 's/$/ 0/' > $OUT_NAME
+		#cat all the null candidates to the screen with a 'zero' label, and all the positives with a one. Also swap tabs for spaces
+		
+		cat $INJECTED_NAME | grep -v "$FRB_INFO"  | sed 's/\t/ /g' |sed 's/$/ 0/' > $OUT_NAME
+		
 		#cat the info of the injected candidate with a 'one' label
+		
 		echo $FRB_INFO | sed 's/$/ 1/' >> $OUT_NAME
 	fi
 done

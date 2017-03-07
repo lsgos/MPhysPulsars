@@ -12,7 +12,6 @@ import subprocess
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
 from scipy.stats import pearsonr
-import MICalc
 
 MICALC_LOCATION = "/home/lewis/MPhysPulsars/src/MICalc++/micalc"
 SUPPORTED_ALGORITHMS = ["jmi","mi"]
@@ -79,7 +78,7 @@ if __name__ == "__main__":
                     print(" ".join([str(field) for field in line]), file = input_f)
         output = subprocess.check_output([MICALC_LOCATION,
                                       '-k', str(args.num_feats),
-                                      "--jmi",
+                                      args.algorithm,
                                       'tmp.dat'])
         selected_features = [int(line.split(' ')[0]) for line in output.split('\n') if line != ""]
         

@@ -78,7 +78,9 @@ def map_dirs(func, path):
     return
 
 def process_file(name):
-    """process all files that match the filename regular expression"""
+    """
+    process all files that match the filename regular expression
+    """
     if CAND_FILE_RE.match(name) is not None:
         frb = FRB_file(name)
         for feat_line in frb.get_features():
