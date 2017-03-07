@@ -33,15 +33,20 @@ class FRB_file(object):
               "max_snr",
               "beam_num"]
         self.n_n_window = 5
-        data = data[data[:,0] != np.inf,:] #remove any datapoints with infinite snr
+        data = data[data[:,0] != np.inf, :] #remove any datapoints with infinite snr
         self.dat = data
         self.labels = labels
     def _calculate_dm(self):
         #returns an array of just the dm values
         return self.dat[:,self.fields.index("dm")]
+    def _calculate_log_dm(self):
+    	return np.log(self._calculate_dm())
+    def _calculate_log_width(self):
+    	return np.log(self._calculate_width())		
     def _calculate_width(self):
         #box width = 2 ^ (filter_width), so the filter width should contain the same information, if not slightly more 
         return self.dat[:,self.fields.index("filter_width")]
+        
     def _calculate_num_neighbours(self):
         """
         This is a heuristic me, mike, mat and alex have come up with: rfi often occurs in 'towers', so 
@@ -59,7 +64,11 @@ class FRB_file(object):
         """
         returns the features as an iterator in string format, for easy writing to a file
         """
-        feature_calcs = [self._calculate_dm, self._calculate_width, self._calculate_num_neighbours] #this defines the order these will be called in 
+        feature_calcs = [self._calculate_dm, 
+        self._calculate_width, 
+        self._calculate_num_neighbours, 
+        self._calculate_log_dm,
+        self._calculate_log_width] #this defines the order these will be called in 
         features = [feature() for feature in feature_calcs]
         features.append(list(self.labels)) #add the label
         for cand_feats in zip(*features):

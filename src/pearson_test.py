@@ -8,6 +8,7 @@ Selection
 from __future__ import print_function
 import argparse
 import tempfile
+import sys
 import subprocess
 import numpy as np
 from sklearn.model_selection import StratifiedKFold
@@ -44,9 +45,9 @@ def pearson_stability_score(A):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find the mutual information of features in a dataset')
-    parser.add_argument("filename",help="The file containing the dataset. Must be in arff format")
+    parser.add_argument("filename",help="The file containing the dataset. Must be in space seperated variable format")
     parser.add_argument("-k", "--num-splits", type = int, help = "number of splits to use when calculating variance", default=10)
-    parser.add_argument("-n", "--num-feats", type = int, help = "number of features to select", default = 4)
+    parser.add_argument("-n", "--num-feats", type = int, help = "number of features to select. If greater than the number of features in the dataset the max possible will be used instead", default = 4)
     parser.add_argument("-a", "--algorithm", help = "Which feature selection algorithm to evaluate: options: [jmi,mi]", default = "mi")
     args = parser.parse_args()
 
@@ -64,6 +65,11 @@ if __name__ == "__main__":
     features = data[:,0:-1]
     num_features = features.shape[1]
     labels = data[:,-1]
+    
+    if args.num_feats >= num_features: 
+    	print("WARNING: Setting num_feats >= number of features in the dataset makes the correlation coefficient meaningless")
+    	sys.exit()
+    
     A = np.zeros([args.num_splits,num_features])
 
     skf = StratifiedKFold(n_splits=args.num_splits, shuffle=True)
@@ -78,10 +84,11 @@ if __name__ == "__main__":
                     print(" ".join([str(field) for field in line]), file = input_f)
         output = subprocess.check_output([MICALC_LOCATION,
                                       '-k', str(args.num_feats),
-                                      args.algorithm,
+                                      '--' + args.algorithm,
                                       'tmp.dat'])
         selected_features = [int(line.split(' ')[0]) for line in output.split('\n') if line != ""]
         
         A[run][selected_features] = 1
+        
     subprocess.call(["rm", "tmp.dat"]) #get rid of tempfile
     print("Pearson's correlation score: {}".format(pearson_stability_score(A)))
