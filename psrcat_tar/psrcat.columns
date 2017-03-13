@@ -1,0 +1,219 @@
+| number |     name |                                                                          description |
+|      1 |     PSRJ |                                                                         Pulsar Jname |
+|      2 |     PSRB |                                                                         Pulsar Bname |
+|      3 |     NAME |                                                                          Pulsar name |
+|      4 |      RAJ |                                                 Right Ascension (J2000) (hh:mm:ss.s) |
+|      5 |     DECJ |                                                      Declination (J2000) (+dd:mm:ss) |
+|      8 |     PMRA |                                                         Proper motion in RA (mas/yr) |
+|      9 |    PMDEC |                                                        Proper motion in DEC (mas/yr) |
+|     10 | POSEPOCH |                                        Epoch at which the position is measured (MJD) |
+|     11 |  DMEPOCH |                              Epoch at which the dispersion measure is measured (MJD) |
+|     12 |       PX |                                                                Annual parallax (mas) |
+|     13 |  PMELONG |                                         Proper motion in Ecliptic longitude (mas/yr) |
+|     14 |    ALIAS |                                                                       Pulsar aliases |
+|     15 | PMERR_PA |                                                Angle for proper motion error ellipse |
+|     16 |     RAJD |                                                        Right Ascension (J2000) (deg) |
+|     17 |    DECJD |                                                            Declination (J2000) (deg) |
+|     18 |       GL |                                                             Galactic Longitude (deg) |
+|     19 |       GB |                                                              Galactic Latitude (deg) |
+|     20 |   PMELAT |                                          Proper motion in Ecliptic latitude (mas/yr) |
+|     21 |      PML |                                                          Proper motion in l (mas/yr) |
+|     22 |      PMB |                                                          Proper motion in b (mas/yr) |
+|     23 |       DM |                                                       Dispersion measure (cm**-3 pc) |
+|     24 |   PEPOCH |                                        Epoch of period/frequency determination (MJD) |
+|     25 |       F0 |                                                  Barycentric rotation frequency (Hz) |
+|     26 |       F1 |                                          Time deriv of baryctr rotn frequency (s^-2) |
+|     27 |       P0 |                                               Barycentric period of the pulsar (sec) |
+|     28 |       P1 |                                                                    Period derivative |
+|     29 |      S30 |                                                                  Flux at 30MHz (mJy) |
+|     30 |      S40 |                                                                  Flux at 40MHz (mJy) |
+|     31 |      S50 |                                                                  Flux at 50MHz (mJy) |
+|     32 |      S60 |                                                                  Flux at 60MHz (mJy) |
+|     33 |      S80 |                                                                  Flux at 80MHz (mJy) |
+|     34 |     S100 |                                                                 Flux at 100MHz (mJy) |
+|     35 |     S150 |                                                                 Flux at 150MHz (mJy) |
+|     36 |     S200 |                                                                 Flux at 200MHz (mJy) |
+|     37 |     S300 |                                                                 Flux at 300MHz (mJy) |
+|     38 |     S400 |                                                                 Flux at 400MHz (mJy) |
+|     39 |     S600 |                                                                 Flux at 600MHz (mJy) |
+|     40 |     S800 |                                                                 Flux at 800MHz (mJy) |
+|     41 |    S1400 |                                                                Flux at 1400MHz (mJy) |
+|     42 |    S2000 |                                                                Flux at 2000MHz (mJy) |
+|     43 |    S4000 |                                                                Flux at 4000MHz (mJy) |
+|     44 |    S5000 |                                                                Flux at 5000MHz (mJy) |
+|     45 |    S6000 |                                                                Flux at 6000MHz (mJy) |
+|     46 |    S8000 |                                                                Flux at 8000MHz (mJy) |
+|     47 |     S10G |                                                                  Flux at 10GHz (mJy) |
+|     48 |     S20G |                                                                  Flux at 20GHz (mJy) |
+|     49 |     S50G |                                                                  Flux at 50GHz (mJy) |
+|     50 |    S100G |                                                                 Flux at 100GHz (mJy) |
+|     51 |    S150G |                                                                 Flux at 150GHz (mJy) |
+|     52 |      W50 |                                                         Width of pulse at 50% (msec) |
+|     53 |      W10 |                                                         Width of pulse at 10% (msec) |
+|     54 |       F2 |                                   Second time deriv of baryctr rotn frequency (s^-3) |
+|     55 |   SPINDX |                                                              Measured spectral index |
+|     56 |       RM |                                                         Rotation measure (rad m**-2) |
+|     57 |   TAU_SC |                                           Temporal broadening of pulses at 1 GHz (s) |
+|     58 |     S900 |                                                                 Flux at 900MHz (mJy) |
+|     59 |     S700 |                                                                 Flux at 700MHz (mJy) |
+|     60 |    S3000 |                                                                Flux at 3000MHz (mJy) |
+|     61 |    S1600 |                                                                Flux at 1600MHz (mJy) |
+|     62 |      DM1 |                        First time derivative of dispersion measure (cm**-3 pc yr^-1) |
+|     63 |       F3 |                                    Third time deriv of baryctr rotn frequency (s^-4) |
+|     64 |       F4 |                                      Fourth time deriv baryctr rotn frequency (s^-5) |
+|     65 |       F5 |                                       Fifth time deriv baryctr rotn frequency (s^-6) |
+|     66 |       F6 |                                       Sixth time deriv baryctr rotn frequency (s^-7) |
+|     67 |      DM2 |                            Second time deriv of dispersion measure (cm**-3 pc yr^-2) |
+|     68 | BRK_INDX |                                                             Braking index (observed) |
+|     69 |     P1_I |                                 Period derivative corrected for proper motion effect |
+|     70 |       F7 |                                     Seventh time deriv baryctr rotn frequency (s^-8) |
+|     71 |       F8 |                                      Eighth time deriv baryctr rotn frequency (s^-9) |
+|     72 |       F9 |                                      Ninth time deriv baryctr rotn frequency (s^-10) |
+|     73 |      DM2 |                            Second time deriv of dispersion measure (cm**-3 pc yr^-2) |
+|     74 |      DM3 |                             Third time deriv of dispersion measure (cm**-3 pc yr^-3) |
+|     75 |      DM4 |                            Fourth time deriv of dispersion measure (cm**-3 pc yr^-4) |
+|     76 |      DM5 |                             Fifth time deriv of dispersion measure (cm**-3 pc yr^-5) |
+|     77 |      DM6 |                             Sixth time deriv of dispersion measure (cm**-3 pc yr^-6) |
+|     78 |      DM7 |                           Seventh time deriv of dispersion measure (cm**-3 pc yr^-7) |
+|     79 |      DM8 |                            Eighth time deriv of dispersion measure (cm**-3 pc yr^-8) |
+|     80 |      DM9 |                             Ninth time deriv of dispersion measure (cm**-3 pc yr^-9) |
+|     81 |   BINARY |                                                                         Binary model |
+|     82 |       PB |                                                       Binary period of pulsar (days) |
+|     83 |      ECC |                                                                         Eccentricity |
+|     84 |       A1 |                                          Projected semi-major axis of orbit (lt sec) |
+|     85 |       T0 |                                                            Epoch of periastron (MJD) |
+|     86 |       OM |                                                    Longitude of periastron (degrees) |
+|     87 |    OMDOT |                                                      Periastron advance (degrees/yr) |
+|     88 |     TASC |                                                        Epoch of ascending node (MJD) |
+|     89 |   TASC_2 |                                            Epoch of ascending node (MJD) [2nd orbit] |
+|     90 |     EPS1 |                                                      ECC*sin(OM) - ELL1 binary model |
+|     91 |   EPS1_2 |                                          ECC*sin(OM) - ELL1 binary model [2nd orbit] |
+|     92 |     EPS2 |                                                      ECC*cos(OM) - ELL1 binary model |
+|     93 |   EPS2_2 |                                          ECC*cos(OM) - ELL1 binary model [2nd orbit] |
+|     94 |   OM_ASC |                                               Position angle of ascending node (deg) |
+|     95 | OM_ASC_2 |                                Position angle of ascending node (deg) [second orbit] |
+|     96 |    PBDOT |                                               First time derivative of binary period |
+|     97 |   ECCDOT |                                                First time derivative of eccentricity |
+|     98 |    A1DOT |                       First time derivative of projected semi-major axis (lt-s s^-1) |
+|     99 |     T0_2 |                                                Epoch of periastron [2nd orbit] (MJD) |
+|    100 |     PB_2 |                                          Binary period of pulsar [2nd orbit]  (days) |
+|    101 |      FB0 |                                         Binary frequency of pulsar 1/(PB*86400) (Hz) |
+|    102 |      FB1 |                                  First time derivative of binary frequency (Hz s^-1) |
+|    103 |      FB2 |                                 Second time derivative of binary frequency (Hz s^-2) |
+|    104 |   A12DOT |                      Second time derivative of projected semi-major axis (lt-s s^-2) |
+|    105 |   OM2DOT |                        Second time derivative of longitude of periastron (deg yr^-2) |
+|    106 |  ECC2DOT |                                        Second time derivative of eccentricity (s^-2) |
+|    107 |     A1_2 |                                 Projected semi-major axis of orbit [2nd orbit] (sec) |
+|    108 |    ECC_2 |                                                             Eccentricity [2nd orbit] |
+|    109 |     OM_2 |                                        Longitude of periastron [2nd orbit] (degrees) |
+|    110 |     T0_3 |                                                Epoch of periastron [3rd orbit] (MJD) |
+|    111 |     PB_3 |                                          Binary period of pulsar [3rd orbit]  (days) |
+|    112 |     A1_3 |                              Projected semi-major axis of orbit [3nd orbit] (lt sec) |
+|    113 |     OM_3 |                                        longitude of periastron [3rd orbit] (degrees) |
+|    114 |    GAMMA |                                                   post-Keplerian 'gamma' term  (sec) |
+|    115 |   XPBDOT |                                 Rate of change of orbital period minus GR prediction |
+|    116 |     MTOT |                                                     Total system mass (solar masses) |
+|    117 |    ECC_3 |                                                             Eccentricity [3rd orbit] |
+|    118 |   MASSFN |                                                     The pulsar Mass function (M_sun) |
+|    119 |  MINMASS |                   Minimum companion mass assuming i=90deg and M_ns is 1.35Mo (M_sun) |
+|    120 |  MEDMASS |                                       Median companion mass assuming i=60deg (M_sun) |
+|    121 |  OMDOT_2 |                                          periastron advance [2nd orbit] (degrees/yr) |
+|    122 |  OMDOT_3 |                                          periastron advance [3nd orbit] (degrees/yr) |
+|    123 |  PBDOT_2 |                                          1st time-deriv of binary period [2nd orbit] |
+|    124 |  PBDOT_3 |                                          1st time-deriv of binary period [3rd orbit] |
+|    125 | PPNGAMMA |                                                                  PPN parameter gamma |
+|    126 |     SINI |                                                            Sine of inclination angle |
+|    127 |   SINI_2 |                                                Sine of inclination angle [2nd orbit] |
+|    128 |   SINI_3 |                                                Sine of inclination angle [3rd orbit] |
+|    129 |      KOM |                                                      Longitude of the ascending node |
+|    130 |      KIN |                                                                    Inclination angle |
+|    131 |     MTOT |                                                     Total system mass (solar masses) |
+|    132 |       M2 |                                                        Companion mass (solar masses) |
+|    133 |     M2_2 |                                            Companion mass [2nd orbit] (solar masses) |
+|    134 |     M2_3 |                                            Companion mass [3rd orbit] (solar masses) |
+|    135 |   DTHETA |                                           Relativistic deformation of the orbit (-6) |
+|    136 |   XOMDOT |                              Rate of periastron advance minus GR prediction (deg/yr) |
+|    137 |       DR |                                      Relativistic deformation of the orbit (not fit) |
+|    138 |       A0 |                                         Aberration parameter A0 (microsec - not fit) |
+|    139 |       B0 |                                         Aberration parameter B0 (microsec - not fit) |
+|    140 |       BP |                                   Tensor multi-scalar parameter beta-prime (not fit) |
+|    141 |      BPP |                             Tensor multi-scalar parameter beta-prime-prime (not fit) |
+|    142 |     STIG |                                         STIG Parameter for Freire & Wex (2011) model |
+|    143 |       H3 |                                           H3 Parameter for Freire & Wex (2011) model |
+|    144 |       H4 |                                           H4 Parameter for Freire & Wex (2011) model |
+|    145 |   MASS_Q |                                                                MASS_Q = M_psr/M_comp |
+|    146 | MASS_Q_2 |                                                 MASS_Q = M_psr/M_comp [second orbit] |
+|    147 |   OM_ASC |                                                                               OM_ASC |
+|    148 |  UPRMASS |                           90% confidence upper companion mass limit, i=26deg (M_sun) |
+|    149 | MINOMDOT |                         Minimum Omega dot, assuming sin i=1 and M_ns=1.35Mo (deg/yr) |
+|    150 |  DIST_DM |                                        Distance based on tc93 electron density model |
+|    151 | DIST_DM1 |                                        Distance based on tc93 electron density model |
+|    152 | DIST_AMN | Lower limit on alternate distance based on, e.g., association or HI absorption (kpc) |
+|    153 | DIST_AMX | Upper limit on alternate distance based on, e.g., association or HI absorption (kpc) |
+|    154 |   DIST_A |                    Alternate distance, e.g., from association or HI absorption (kpc) |
+|    155 |     DIST |                                               Best estimate of pulsar distance (kpc) |
+|    156 |    DIST1 |                           Best estimate of pulsar distance, using NE2001 model (kpc) |
+|    157 |  RADDIST |                                      Radial distance from given coordinate (degrees) |
+|    158 |   DMSINB |                                                                DM*sin(b) (cm**-3 pc) |
+|    159 |       XX |                                 X-Distance in X-Y-Z Galactic coordinate system (kpc) |
+|    160 |       YY |                                 Y-Distance in X-Y-Z Galactic coordinate system (kpc) |
+|    161 |       ZZ |                               Distance from the Galactic plane - based on DIST (kpc) |
+|    162 |   SURVEY |                                Surveys that detected pulsar (discovery survey first) |
+|    163 |    ASSOC |                                                        Association with SNR, GC etc. |
+|    164 |  BINCOMP |                                                                Binary companion type |
+|    165 |     TYPE |                                                               Type codes for  pulsar |
+|    166 |     DATE |                                                        Year of discovery publication |
+|    167 |  OSURVEY |                              Surveys that detected pulsar encoded as bits in integer |
+|    168 |  INTERIM |                                                              Interim parameters only |
+|    169 |      AGE |                                                                   Spin down age (yr) |
+|    170 |    AGE_I |                                                         Spin down age from P1_I (yr) |
+|    171 |  BSURF_I |                                            Surface magnetic dipole from P1_I (gauss) |
+|    172 |   EDOT_I |                                        Spin down energy loss rate from P1_I (ergs/s) |
+|    173 |   EDOTD2 |                                                Energy flux at the Sun (ergs/kpc^2/s) |
+|    174 |    R_LUM |                                              Radio luminosity at 400MHz (mJy kpc**2) |
+|    175 |  R_LUM14 |                                             Radio luminosity at 1400MHz (mJy kpc**2) |
+|    176 |    PMTOT |                                                         Total proper motion (mas/yr) |
+|    177 |   VTRANS |                                           Transverse velocity - based on DIST (km/s) |
+|    178 |    BSURF |                                                Surface magnetic flux density (Gauss) |
+|    179 |     B_LC |                                      Magnetic flux density at light cylinder (Gauss) |
+|    180 |    SI414 |                                                 Spectral index based on S400 & S1400 |
+|    181 |     EDOT |                                                  Spin down energy loss rate (ergs/s) |
+|    182 |    START |                                                          Epoch of start of fit (MJD) |
+|    183 |   FINISH |                                                            Epoch of end of fit (MJD) |
+|    184 |     TRES |                                                       RMS timing residual (microsec) |
+|    185 |      CLK |                                                            Terrestrial time standard |
+|    186 |    EPHEM |                                                               Solar system ephemeris |
+|    187 |   TZRMJD |                                                                  Reference TOA (MJD) |
+|    188 |   TZRFRQ |                                                     Frequency of reference TOA (MHz) |
+|    189 |  TZRSITE |                                         One-letter observatory code of reference TOA |
+|    190 |     NTOA |                                                         Number of TOAs in timing fit |
+|    191 |     TDMP |                                                    Ideal dump time for pulsar  (sec) |
+|    192 |  TDMPMIN |                                                  Minimum dump time for pulsar  (sec) |
+|    193 |   EPHVER |                                                                    Ephemeris version |
+|    194 |    UNITS |                                                                     Units definition |
+|    195 |    NSPAN |                                                              Minutes for polyco span |
+|    196 |    NCOEF |                                                     Number of coefficients in polyco |
+|    197 |     NBIN |                                                        Number of bins in the profile |
+|    198 |   NTCOEF |                                            Number of time coefficients in prediction |
+|    199 |   NFCOEF |                                       Number of frequency coefficients in prediction |
+|    200 |  PREDLEN |                                                                Prediction length (s) |
+|    201 |     NSUB |                                                          Number of subbands to store |
+|    202 |   WBNCHN |      WB correlator: number of frequency channels (nearest submultiple of orig NCHAN) |
+|    203 |   WBTSUB |                          WB correlator: subint time (nearest multiple of cycle time) |
+|    204 |   WBNBIN |                         WB correlator: nr of bins (nearest submult of original nbin) |
+|    205 |   FBNCHN |        Filter bank: number of frequency channels (nearest submultiple of orig NCHAN) |
+|    206 |   FBTSUB |                                                             Filter bank: subint time |
+|    207 |   FBNBIN |                                                              Filter bank: nr of bins |
+|    208 |    CPCOH |                                CPSR: 1 or 0, whether to coherently dedisperse or not |
+|    209 |   CPNCHN |                                                         CPSR: channels during FFTing |
+|    210 |   CPNFFT |                                                                   CPSR: N pts in FFT |
+|    211 |  CPNCHN2 |                                              CPSR: Final #channels after fscrunching |
+|    212 |   CPTSUB |                                                                    CPSR: subint time |
+|    213 |   CPNBIN |                                                                     CPSR: nr of bins |
+|    222 |     NGLT |                                                          Number of observed glitches |
+|    223 |     GLEP |                                                                   Glitch epoch (MJD) |
+|    224 |     GLPH |                                                               Glitch phase increment |
+|    225 |     GLF0 |                                      Glitch permanent pulse frequency increment (Hz) |
+|    226 |     GLF1 |                                    Glitch permanent frequency deriv increment (s^-2) |
+|    227 |    GLF0D |                                                Glitch pulse frequency increment (Hz) |
+|    228 |     GLTD |                                                       Glitch Decay time constant (d) |
