@@ -190,17 +190,22 @@ int main(int argc, char *argv[]) {
     show_help(); return -1;
   }
   // parse filename
-  if (optind != (argc - 1)) {
+  if (optind < (argc - 1)) {
     // only one option
     show_help();
     return -1;
   }
-
-  filename = argv[optind];
-  std::fstream fs;
-  fs.open(filename);
-  auto input_data = read_data(fs);
-  fs.close();
+  std::vector<std::vector<unsigned int>> input_data;
+  if (optind == argc -1) {
+  	filename = argv[optind];
+  	std::fstream fs;
+  	fs.open(filename);
+  	input_data = read_data(fs);
+  	fs.close();
+  } else {
+  	input_data = read_data(std::cin);
+  }
+  	
   switch (errcode) {
   case Error::non_integer_input:
     std::cout << "Encountered non integer input in " << filename << " at line "
