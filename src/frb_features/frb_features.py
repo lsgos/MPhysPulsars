@@ -16,7 +16,7 @@ class FRB_file(object):
     """
     read and represent a frb candidate file
     """
-    def __init__(self, filename, n_bins=10, filter_zero_dm = False):
+    def __init__(self, filename, n_bins=10, filter_zero_dm = True):
         data, labels = frb_cand.read(filename)
         self.n_bins = n_bins
         self.fields = ["snr",
@@ -77,14 +77,18 @@ class FRB_file(object):
         time_ind = self.fields.index("time_of_peak")
         return np.logical_and( time_low < self.dat[:,time_ind], self.dat[:,time_ind] < time_hi).astype(np.int).sum()
         
+        
+    def get_random_benchmark(self):
+    	#this method is simply a sanity check: generate a random array so we have a MI 'baseline'. 
+    	return np.random.random(len(self.labels))
     def get_features(self):
         """
         returns the features as an iterator in string format, for easy writing to a file
         """
-        feature_calcs = [self._calculate_dm, 
+        feature_calcs = [
+        self.get_random_benchmark,
+        self._calculate_dm, 
         self._calculate_width, 
-        #self._calculate_log_dm,
-        #self._calculate_log_width,
         ] 
         
         #add nearest neightbour scores at various widths to the calculation
