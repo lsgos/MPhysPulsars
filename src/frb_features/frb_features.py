@@ -52,7 +52,13 @@ class FRB_file(object):
     def _calculate_dm(self):
         #returns an array of just the dm values
         return self.dat[:,self.fields.index("dm")]
-        
+    
+    def _calculate_grouped_candidates(self):
+        return self.dat[:,self.fields.index("grouped_cands")].astype(np.int)
+       
+    def _calculate_group_time(self):
+     	return self.dat[:,self.fields.index("end_time_group")] - self.dat[:,self.fields.index("start_time_group")]
+     	
     def _calculate_log_dm(self):
     	return np.log(self._calculate_dm())
     	
@@ -86,9 +92,10 @@ class FRB_file(object):
         returns the features as an iterator in string format, for easy writing to a file
         """
         feature_calcs = [
-        self.get_random_benchmark,
         self._calculate_dm, 
         self._calculate_width, 
+        self._calculate_grouped_candidates,
+        self._calculate_group_time,
         ] 
         
         #add nearest neightbour scores at various widths to the calculation
