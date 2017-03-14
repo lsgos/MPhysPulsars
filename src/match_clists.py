@@ -2,7 +2,7 @@
 This script will search a load of clists for known sources using the psrcat, printing out
 the matched source filename to the screen 
 """
-
+import multiprocessing as mp
 import argparse
 import clist_cand
 import atnf_catalogue
@@ -14,14 +14,14 @@ P0_TOL = 10                              #default maximum period difference to c
 DM_TOL = 20                         # default maximum dm difference to consider a match
 
 
-def matches_known_source(cand):
+def match_known_source(cand):
     pos, period, dm, name = cand
     
     match, _  = atnf_catalogue.return_match(pos, SEP_TOL)
     
     if match is not None and abs(period - match['P0_ms']) < P0_TOL and abs(dm - match['DM']) < DM_TOL:
-    	return True
-    return False
+    	print name
+    return 
 
 if __name__ == "__main__": 
     parser = argparse.ArgumentParser(description="Searches a directory for clist files, printing out the filenames of the original sources that match known pulsars in"
@@ -43,12 +43,11 @@ if __name__ == "__main__":
         
     if os.path.isdir(args.dir):
     	cands = clist_cand.candidates_in(args.dir)
-    	for cand in cands:
-    		
-    		_,_,_,name = cand 
-    		
-    		if matches_known_source(cand):
-    			print name
+    	
+    	#setup a worker pool
+    	workers = mp.Pool(mp.cpu_count())
+    	workers.imap_unordered(match_known_source, cands)
+    
     	
     		
     else:
