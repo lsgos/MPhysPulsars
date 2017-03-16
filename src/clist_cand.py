@@ -27,8 +27,8 @@ def read(filename):
     
     #cands are xml subtrees: access the elements via, e.g cand.find('Period').text 	
     
-    periods = [cand.find('Period').text for cand in cands]
-    dms = [cand.find('Dm').text for cand in cands]
+    periods = [float(cand.find('Period').text) for cand in cands]
+    dms = [float(cand.find('Dm').text) for cand in cands]
     filenames = [cand.find('CandFile').text for cand in cands]
     
     candidates_info = zip( itertools.repeat(location), periods, dms, filenames )

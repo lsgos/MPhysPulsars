@@ -16,7 +16,6 @@ DM_TOL = 20                         # default maximum dm difference to consider 
 
 def match_known_source(cand):
     pos, period, dm, name = cand
-    
     match, _  = atnf_catalogue.return_match(pos, SEP_TOL)
     
     if match is not None and abs(period - match['P0_ms']) < P0_TOL and abs(dm - match['DM']) < DM_TOL:
@@ -43,11 +42,10 @@ if __name__ == "__main__":
         
     if os.path.isdir(args.dir):
     	cands = clist_cand.candidates_in(args.dir)
-    	
     	#setup a worker pool
     	workers = mp.Pool(mp.cpu_count())
-    	workers.imap_unordered(match_known_source, cands)
-    
+    	for _ in workers.imap_unordered(match_known_source, cands):
+   		continue #force the iterator to be consumed 
     	
     		
     else:

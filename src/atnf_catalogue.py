@@ -43,7 +43,7 @@ def get_coord_catalog(table):
 	decs =np.array(table['DECJ'])
 	ras = np.array(table['RAJ'])
 	catalog = [" ".join([ra,dec]) for ra,dec in zip(ras,decs)]	
-	return SkyCoord(catalog, unit = (units.deg, units.deg))
+	return SkyCoord(catalog, unit = (units.hourangle, units.deg))
 
 PSRCAT_TABLE = get_psrcat_table()
 PSRCAT = get_coord_catalog(PSRCAT_TABLE)
