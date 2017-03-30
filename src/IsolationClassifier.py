@@ -41,7 +41,7 @@ class IsolationTreeClassifier(object):
         anomaly_scores = self.iForest.decision_function(X).reshape(-1,1)
         return self.stump.predict(anomaly_scores)
     def decision_function(self, X):
-        return self.iForest.decision_function(X)
+        return (-1) * self.iForest.decision_function(X)
     def score(self, X, Y):
         """Accuracy score for the classifier """
         anomaly_scores = self.iForest.decision_function(X).reshape(-1,1)
@@ -82,7 +82,7 @@ class IsolationRatioClassifier(object):
 
 
     def decision_function(self, X):
-        return self.iForest.decision_function(X)
+        return (-1) * self.iForest.decision_function(X)
     def score(self, X, Y):
         """Accuracy score for the classifier """
         Y_ = self.predict(X)
