@@ -25,6 +25,7 @@ from scipy.stats import ttest_rel
 from JACS_utils.ARFF import ARFF
 from JACS_utils.ClassifierStats import ClassifierStats
 
+from sklearn.base import clone
 from sklearn.externals import joblib
 
 
@@ -41,6 +42,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 
 
+#my own custom classifier 
+
 from IsolationClassifier import IsolationTreeClassifier, IsolationRatioClassifier
 
 #Helper functions. These cannot go in the class because we are using parallel computation
@@ -49,6 +52,7 @@ from IsolationClassifier import IsolationTreeClassifier, IsolationRatioClassifie
 def _calculate_metrics(clf, x, y, msp_label, show_msp_results, split_tup):
 
     train_index, test_index = split_tup
+    #clf = clone(classifier) #make sure they are not modified outside the loop
 
     x_train, x_test = x[train_index], x[test_index]
     y_train, y_test = y[train_index], y[test_index]
@@ -97,6 +101,7 @@ def _get_metrics(C, datalen):
 
 def _score_test(clf,x,y,test_x,test_y, split_tup):
     train_index,_ = split_tup
+    #clf = clone(classifier)
     x_train,y_train = x[train_index], y[train_index]
     clf.fit(x_train,y_train)
     score = clf.score(test_x,test_y)
@@ -230,7 +235,7 @@ class Evaluator:
 
 
 if __name__ == "__main__":
-    #valid_features = set([0,1,2,3,4,5,6,7,8]) #the allowed features
+    valid_features = set([0,1,2,3,4,5,6,7,8]) #the allowed features
 
     parser = argparse.ArgumentParser(description = "Evaluates the perfomance \
             of several classifiers on a pulsar dataset in .arff format\n. \
@@ -245,7 +250,10 @@ if __name__ == "__main__":
     parser.add_argument("--test", help = "Testing set (optional). If this argument \
                         is supplied, the classifiers trained on the training set \
                         are tested on this set")
-
+    parser.add_argument("--select_features","-f",help = "Features to train the \
+                    classification on. By default use all except the period. \
+                    Period is field 0, fields 1-8 are those from Lyon et. al.\
+                     (default = [1,2,3,4,5,6,7,8])", default = "[1,2,3,4,5,6,7,8]")
     parser.add_argument("--save_classifiers",
         help = "Save trained classifiers to disk using joblib in \
                     this path location if provided")
@@ -264,7 +272,17 @@ if __name__ == "__main__":
 
     TERMCOLOR = TERMCOLOR and (not args.no_termcolor)
 
+    try:
+        selected_features = ast.literal_eval(args.select_features)
+        #test to see if the features are valid
+        if len( set(selected_features) - valid_features) > 0:
+            raise ValueError
 
+    except ValueError as v:
+        print ("Unable to parse selected features: please specify a \
+                valid list of integers in the range [0,8]")
+        print ("Feature 0 = Period, Features 1-8: See Lyon et. al.")
+        raise v
 
     arff_reader = ARFF()
     try:
@@ -279,6 +297,9 @@ if __name__ == "__main__":
         print("Cannot provide seperate MSP validation if no data points are labelled as msp's. Msp's should be labelled with a %***MSP*** comment in the arff file")
         raise e
 
+    #select features
+
+    train_x = train_x[:,selected_features]
 
     evaluator = Evaluator(train_x,train_y, train_labelled_msp, args.k_folds, args.n_jobs,args.show_msp_results, use_termcolor = TERMCOLOR)
 
