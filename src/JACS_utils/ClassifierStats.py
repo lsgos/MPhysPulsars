@@ -198,8 +198,10 @@ class ClassifierStats:
 
         #self.matthewsCorrelation = ((self.TP * self.TN) - (self.FP * self.FN)) / \
         #sqrt((self.TP+self.FP) * (self.TP+self.FN) * (self.TN+self.FP) * (self.TN+self.FN))
-
-        self.fScore = 2 * ((self.precision * self.recall) / (self.precision + self.recall))
+	if self.precision == 0.0 and self.recall == 0:
+		self.fScore = 0
+	else:
+        	self.fScore = 2 * ((self.precision * self.recall) / (self.precision + self.recall))
 
         # Kappa = (totalAccuracy - randomAccuracy) / (1 - randomAccuracy)
         #

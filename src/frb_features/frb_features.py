@@ -87,6 +87,10 @@ class FRB_file(object):
     def get_random_benchmark(self):
     	#this method is simply a sanity check: generate a random array so we have a MI 'baseline'. 
     	return np.random.random(len(self.labels))
+    	
+    def _calculate_snr(self):
+    	return self.dat[:,self.fields.index("snr")]
+    	
     def get_features(self):
         """
         returns the features as an iterator in string format, for easy writing to a file
@@ -96,6 +100,7 @@ class FRB_file(object):
         self._calculate_width, 
         self._calculate_grouped_candidates,
         self._calculate_group_time,
+        self._calculate_snr,
         ] 
         
         #add nearest neightbour scores at various widths to the calculation

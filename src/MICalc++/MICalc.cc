@@ -14,6 +14,7 @@
 #define COMPILE_C // neccesary to make FSAlgorithms not try to import mex.h
 extern "C" {
 #include "FSAlgorithms.h"
+#include "hellinger_measure.h"
 }
 
 #include "getopt.h"
@@ -131,7 +132,8 @@ void show_help() {
             << "FEATURE OPTIONS (if none provided, will calculate all measures and pretty print with titles.)" << std::endl
             << "Only one feature option will be accepted" << std::endl
             << '\t' << "--jmi  : rank using the joint mutual information" << std::endl
-            << '\t' << "--mi   : rank using the mutual information" << std::endl;
+            << '\t' << "--mi   : rank using the mutual information" << std::endl
+            << '\t' << "--hel   : rank using the hellinger distance" << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -142,9 +144,12 @@ int main(int argc, char *argv[]) {
   unsigned int k = -1;
   int jmi_flag = 0;
   int mi_flag = 0;
+  int hel_flag = 0;
+
   static struct option long_options[] = {
     {"jmi", no_argument, &jmi_flag, 1},
     {"mi",  no_argument, &mi_flag,  1},
+    {"hel", no_argument, &hel_flag, 1},
     {0,0,0,0}, 
   };
   int flag_tot = 0;
@@ -250,6 +255,9 @@ int main(int argc, char *argv[]) {
   unsigned int MIM_output_features[k];
   double MIM_scores[k];
 
+  unsigned int H_output_features[k];
+  double H_scores[k];
+
   
   if (flag_tot == 0) {
     //show all features with headers
@@ -257,6 +265,8 @@ int main(int argc, char *argv[]) {
       JMI_scores);
     MIM(k, num_points, num_feats, data_arr, class_arr, MIM_output_features,
       MIM_scores);
+    HellingerDist(k, num_points, num_feats, data_arr, class_arr, H_output_features,
+      H_scores);
     std::cout << "--MI--" << std::endl;
     for (int i = 0; i < k; ++i) {
       std::cout << MIM_output_features[i] << " " << MIM_scores[i] << std::endl;
@@ -265,6 +275,11 @@ int main(int argc, char *argv[]) {
     std::cout << "--JMI--" << std::endl;
     for (int i = 0; i < k; ++i) {
       std::cout << JMI_output_features[i] << " " << JMI_scores[i] << std::endl;
+    }
+
+    std::cout << "--HD--" << std::endl;
+    for (int i = 0; i < k; ++i) {
+      std::cout << H_output_features[i] << " " << H_scores[i] << std::endl;
     }
   } else if (jmi_flag) {
     //show only jmi, no header
