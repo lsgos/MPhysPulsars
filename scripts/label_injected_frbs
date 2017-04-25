@@ -48,5 +48,7 @@ for CAND in $(ls $TARGET_DIR)
 		#cat the info of the injected candidate with a 'one' label
 		
 		echo $FRB_INFO | sed 's/$/ 1/' >> $OUT_NAME
+	else 
+		echo $CAND
 	fi
 done

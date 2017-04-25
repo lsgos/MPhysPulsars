@@ -1,0 +1,18 @@
+#Since we are no longer using our generated features, the python script is overkill
+#useful features are : SNR (1) DM (6) and filter width (4) and the class (last column)
+
+TARGET_DIR=$1
+
+for file in $(ls $TARGET_DIR)
+do
+	FNAME="$TARGET_DIR""/""$file""/labelled_dataset.dat"
+	if [[ -f $FNAME ]] ; then
+		if (( $(wc -l < $FNAME) < 2 )); then 
+			for i in $(ls "$TARGET_DIR""/""$file""/injected" | grep '_injected.cands')
+			do
+				cat "$TARGET_DIR""/""$file""/injected/""$i"
+			done
+		fi 
+		
+	fi
+done
